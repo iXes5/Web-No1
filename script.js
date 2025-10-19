@@ -239,14 +239,15 @@ $(document).ready(function() {
         }
         
         try {
-            const regex = new RegExp(regexText, 'gi');
+            // Sử dụng flag 'g' thay vì 'gi' để phân biệt hoa thường
+            const regex = new RegExp(regexText, 'g');
             const $content = $('.process-text-content');
             let content = $content.html();
             
             // Loại bỏ các highlight cũ để tránh chồng chất
             content = content.replace(/<span class="highlighted"[^>]*>(.*?)<\/span>/gi, '$1');
             
-            // Highlight text với style hiện tại từ decoration
+            // Highlight text với style hiện tại từ decoration (phân biệt hoa thường)
             content = content.replace(regex, match => 
                 `<span class="highlighted" style="font-weight: ${currentFontWeight}; font-style: ${currentFontStyle}; text-decoration: ${currentTextDecoration}; background-color: ${currentBgColor}; color: ${currentTextColor};">${match}</span>`
             );
@@ -265,12 +266,15 @@ $(document).ready(function() {
         }
         
         try {
-            const regex = new RegExp(regexText, 'gi');
+            // Sử dụng flag 'g' thay vì 'gi' để phân biệt hoa thường
+            const regex = new RegExp(regexText, 'g');
             const $content = $('.process-text-content');
             let content = $content.html();
             
-            // Xóa cả text thường và text đã highlight khớp regex
-            content = content.replace(new RegExp(`<span class="highlighted"[^>]*>(${regexText})<\/span>`, 'gi'), '');
+            // Xóa cả text thường và text đã highlight khớp regex (phân biệt hoa thường)
+            // Escape regexText để tránh lỗi khi có ký tự đặc biệt trong regex
+            const escapedRegexText = regexText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            content = content.replace(new RegExp(`<span class="highlighted"[^>]*>(${escapedRegexText})<\/span>`, 'g'), '');
             content = content.replace(regex, '');
             
             $content.html(content);
