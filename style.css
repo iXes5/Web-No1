@@ -121,6 +121,10 @@
 }
 
 /* Box đóng */
+.aside-box.closed .aside-box-bar {
+    background-color: #ffc366;
+}
+
 .aside-box.closed .aside-content {
     display: none;
 }
@@ -198,14 +202,28 @@
 .decorate-box {
     position: relative;
     display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.decorate-icon {
     cursor: pointer;
+    padding: 5px 5px;
+    border-radius: 30px;
+    background-color: #3157e0;
+    transition: 0.2s;
+}
+
+.decorate-icon:hover {
+    background-color: #4e75e9;
 }
 
 .decorate-options {
     position: absolute;
-    top: 40px;
-    left: 0;
+    top: 100%; /* Nằm ngay dưới decorate-box */
+    right: 0;
     background-color: #f9f9f9;
+    color: #333;
     border: 1px solid #ccc;
     padding: 10px;
     border-radius: 8px;
@@ -215,17 +233,10 @@
     min-width: 150px;
 }
 
-.decorate-options label {
-    display: block;
-    margin-bottom: 5px;
-    font-size: 14px;
-}
-
-
 .process-text-content {
     flex: 1;
     padding: 15px;
-    font-size: 18px;
+    font-size: 23px;
     line-height: 1.2;
     color: #333;
     background-color: white;
