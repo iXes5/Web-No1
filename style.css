@@ -320,3 +320,9 @@
     display: none;
 }
 
+/* Thêm vào cuối file style.css */
+.dragging-clone {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transform: scale(1.02);
+    transition: none;
+}

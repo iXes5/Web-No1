@@ -55,20 +55,9 @@ $(document).ready(function() {
     // ===== CHỨC NĂNG KÉO THẢ NEWS BOX =====
     let isDragging = false;
     let $draggedItem = null;
-    let $placeholder = null;
+    let $clone = null;
     let startY = 0;
-    let startOffset = 0;
-
-    // Tạo placeholder
-    function createPlaceholder() {
-        return $('<div class="aside-box-placeholder"></div>').css({
-            'height': '50px',
-            'border': '2px dashed #f38600',
-            'background-color': '#fff7ec',
-            'margin-bottom': '5px',
-            'border-radius': '1px'
-        });
-    }
+    let startTop = 0;
 
     // Xử lý kéo thả
     $('.move-btn').on('mousedown', function(e) {
@@ -78,20 +67,35 @@ $(document).ready(function() {
         isDragging = true;
         $draggedItem = $(this).closest('.aside-box');
         startY = e.clientY;
-        startOffset = $draggedItem.offset().top;
+        startTop = $draggedItem.offset().top;
         
-        // Thêm hiệu ứng dragging
-        $draggedItem.addClass('dragging').css({
+        // Lấy vị trí và kích thước của aside
+        const $aside = $('.aside');
+        const asideOffset = $aside.offset();
+        const asideTop = asideOffset.top;
+        const asideLeft = asideOffset.left;
+        const asideWidth = $aside.width();
+        const asideHeight = $aside.outerHeight();
+        
+        // Tạo clone
+        $clone = $draggedItem.clone();
+        $clone.addClass('dragging-clone').css({
             'position': 'absolute',
             'z-index': '1000',
-            'width': $draggedItem.outerWidth(),
+            'width': asideWidth + 'px',
             'opacity': '0.8',
-            'pointer-events': 'none'
+            'pointer-events': 'none',
+            'left': asideLeft + 'px',
+            'top': startTop + 'px',
+            'margin': '0',
+            'box-sizing': 'border-box'
         });
         
-        // Tạo placeholder
-        $placeholder = createPlaceholder();
-        $draggedItem.after($placeholder);
+        // Ẩn item gốc
+        $draggedItem.css('visibility', 'hidden');
+        
+        // Thêm clone vào body
+        $('body').append($clone);
         
         // Thêm sự kiện di chuyển và thả
         $(document).on('mousemove.drag', onMouseMove);
@@ -99,58 +103,69 @@ $(document).ready(function() {
     });
 
     function onMouseMove(e) {
-        if (!isDragging || !$draggedItem) return;
+        if (!isDragging || !$clone) return;
         
         const deltaY = e.clientY - startY;
-        $draggedItem.css('top', (startOffset + deltaY) + 'px');
-        updatePlaceholderPosition(e.clientY);
+        const $aside = $('.aside');
+        const asideOffset = $aside.offset();
+        const asideTop = asideOffset.top;
+        const asideBottom = asideTop + $aside.outerHeight();
+        const cloneHeight = $clone.outerHeight();
+        
+        // Tính toán vị trí mới
+        let newTop = startTop + deltaY;
+        
+        // Giới hạn phạm vi di chuyển trong aside
+        // Không cho phép kéo ra khỏi aside
+        if (newTop < asideTop) {
+            newTop = asideTop;
+        }
+        if (newTop + cloneHeight > asideBottom) {
+            newTop = asideBottom - cloneHeight;
+        }
+        
+        $clone.css('top', newTop + 'px');
     }
 
-    function updatePlaceholderPosition(currentY) {
-        const $boxes = $('.aside-box').not($draggedItem).not($placeholder);
+    function onMouseUp() {
+        if (!isDragging || !$draggedItem || !$clone) return;
+        
+        const finalTop = $clone.offset().top;
+        const $aside = $('.aside');
+        const $allBoxes = $('.aside-box').not($draggedItem);
+        let newPosition = null;
         let inserted = false;
         
-        $boxes.each(function() {
+        // Tìm vị trí mới để chèn dựa trên vị trí clone
+        $allBoxes.each(function() {
             const $box = $(this);
             const boxTop = $box.offset().top;
             const boxHeight = $box.outerHeight();
             const boxMiddle = boxTop + boxHeight / 2;
             
-            if (currentY < boxMiddle) {
-                $box.before($placeholder);
+            if (finalTop < boxMiddle) {
+                newPosition = $box;
                 inserted = true;
                 return false; // break loop
             }
         });
         
-        if (!inserted) {
-            $('.aside').append($placeholder);
-        }
-    }
-
-    function onMouseUp() {
-        if (!isDragging || !$draggedItem) return;
-        
-        // Chèn box vào vị trí placeholder
-        if ($placeholder && $placeholder.length) {
-            $placeholder.before($draggedItem);
-            $placeholder.remove();
+        // Di chuyển item đến vị trí mới
+        if (newPosition) {
+            newPosition.before($draggedItem);
+        } else {
+            // Nếu không tìm thấy vị trí phù hợp, thêm vào cuối
+            $aside.append($draggedItem);
         }
         
-        // Reset styles
-        $draggedItem.removeClass('dragging').css({
-            'position': '',
-            'top': '',
-            'z-index': '',
-            'width': '',
-            'opacity': '',
-            'pointer-events': ''
-        });
+        // Xóa clone và reset styles
+        $clone.remove();
+        $draggedItem.css('visibility', '');
         
         // Reset variables
         isDragging = false;
         $draggedItem = null;
-        $placeholder = null;
+        $clone = null;
         
         // Xóa sự kiện
         $(document).off('mousemove.drag');
