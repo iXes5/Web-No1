@@ -247,7 +247,87 @@
 .drag-drop {
     width: 100%;
     min-height: 300px;
-    background-color: orange;
+    background-color: white;
+    border-radius: 5px;
+    margin-top: 8px;
+    border: 1px solid gray;
+    margin-bottom: 5px;
+}
+
+.drag-drop-bar {
+    background: linear-gradient(to bottom, #889eed, #627fea);
+    color: #fff7ec;
+    display: flex;
+    align-items: center;;
+    padding: 8px 12px;
+    user-select: none;
+    font-size: 18px;
+    font-weight: bold;
+    height: 40px;
+    box-sizing: border-box;
+    border-radius: 5px 5px 0 0;
+}
+
+.zodiac-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: 400px;
+}
+
+/* Zodiac box styles */
+.drag-drop-content {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    padding: 15px;
+    min-height: 200px;
+    position: relative;
+}
+
+.zodiac-box {
+    width: 100%;
+    aspect-ratio: 1;
+    border: 2px solid #627fea;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    background-color: #f0f4ff;
+    cursor: move;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.zodiac-box:hover {
+    background-color: #e1e8ff;
+    transform: scale(1.05);
+}
+
+.zodiac-dragging-clone {
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    transform: scale(1.1);
+    transition: none;
+    border: 2px dashed #627fea;
+}
+
+.zodiac-emoji {
+    user-select: none;
+    pointer-events: none;
+}
+
+/* Ngăn chặn selection khi kéo */
+.zodiac-box {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* Style cho box đang được kéo */
+.zodiac-box.dragging-original {
+    opacity: 0.3;
 }
 
 .footer {
