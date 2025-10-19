@@ -72,10 +72,8 @@ $(document).ready(function() {
         // Lấy vị trí và kích thước của aside
         const $aside = $('.aside');
         const asideOffset = $aside.offset();
-        const asideTop = asideOffset.top;
         const asideLeft = asideOffset.left;
         const asideWidth = $aside.width();
-        const asideHeight = $aside.outerHeight();
         
         // Tạo clone
         $clone = $draggedItem.clone();
@@ -92,7 +90,7 @@ $(document).ready(function() {
         });
         
         // Ẩn item gốc
-        $draggedItem.css('visibility', 'hidden');
+        $draggedItem.css('opacity', '0.3');
         
         // Thêm clone vào body
         $('body').append($clone);
@@ -106,23 +104,9 @@ $(document).ready(function() {
         if (!isDragging || !$clone) return;
         
         const deltaY = e.clientY - startY;
-        const $aside = $('.aside');
-        const asideOffset = $aside.offset();
-        const asideTop = asideOffset.top;
-        const asideBottom = asideTop + $aside.outerHeight();
-        const cloneHeight = $clone.outerHeight();
         
-        // Tính toán vị trí mới
-        let newTop = startTop + deltaY;
-        
-        // Giới hạn phạm vi di chuyển trong aside
-        // Không cho phép kéo ra khỏi aside
-        if (newTop < asideTop) {
-            newTop = asideTop;
-        }
-        if (newTop + cloneHeight > asideBottom) {
-            newTop = asideBottom - cloneHeight;
-        }
+        // Tính toán vị trí mới - không giới hạn phạm vi
+        const newTop = startTop + deltaY;
         
         $clone.css('top', newTop + 'px');
     }
@@ -134,7 +118,6 @@ $(document).ready(function() {
         const $aside = $('.aside');
         const $allBoxes = $('.aside-box').not($draggedItem);
         let newPosition = null;
-        let inserted = false;
         
         // Tìm vị trí mới để chèn dựa trên vị trí clone
         $allBoxes.each(function() {
@@ -145,7 +128,6 @@ $(document).ready(function() {
             
             if (finalTop < boxMiddle) {
                 newPosition = $box;
-                inserted = true;
                 return false; // break loop
             }
         });
@@ -160,7 +142,7 @@ $(document).ready(function() {
         
         // Xóa clone và reset styles
         $clone.remove();
-        $draggedItem.css('visibility', '');
+        $draggedItem.css('opacity', '');
         
         // Reset variables
         isDragging = false;
@@ -322,5 +304,215 @@ $(document).ready(function() {
     // ===== NGĂN CHẶN SELECTION KHI KÉO THẢ =====
     $('.move-btn, .aside-box-bar').on('selectstart', function(e) {
         e.preventDefault();
+    });
+
+    // ===== CHỨC NĂNG ZODIAC DRAG & DROP =====
+    let isZodiacDragging = false;
+    let $zodiacDraggedItem = null;
+    let $zodiacClone = null;
+    let zodiacStartX = 0;
+    let zodiacStartY = 0;
+    let originalIndex = -1;
+
+    // Thêm box zodiac mới
+    $('.add-zodiac-btn').on('click', function() {
+        const selectedZodiac = $('.zodiac-select').val();
+        const zodiacEmoji = $('.zodiac-select option:selected').html();
+        
+        // Tạo box zodiac mới
+        const $zodiacBox = $('<div class="zodiac-box"></div>')
+            .attr('data-zodiac', selectedZodiac)
+            .html(`<span class="zodiac-emoji">${zodiacEmoji}</span>`);
+        
+        // Thêm vào content (cuối cùng)
+        $('.drag-drop-content').append($zodiacBox);
+        
+        // Thêm sự kiện kéo thả cho box mới
+        addZodiacDragEvents($zodiacBox);
+    });
+
+    // Thêm sự kiện kéo thả cho box zodiac
+    function addZodiacDragEvents($zodiacBox) {
+        $zodiacBox.on('mousedown', function(e) {
+            e.preventDefault();
+            
+            isZodiacDragging = true;
+            $zodiacDraggedItem = $(this);
+            zodiacStartX = e.clientX;
+            zodiacStartY = e.clientY;
+            
+            // Lưu vị trí ban đầu
+            originalIndex = $zodiacDraggedItem.index();
+            
+            // Tạo clone
+            $zodiacClone = $zodiacDraggedItem.clone();
+            const originalRect = $zodiacDraggedItem[0].getBoundingClientRect();
+            
+            $zodiacClone.addClass('zodiac-dragging-clone').css({
+                'position': 'fixed',
+                'z-index': '1000',
+                'width': originalRect.width + 'px',
+                'height': originalRect.height + 'px',
+                'opacity': '0.9',
+                'pointer-events': 'none',
+                'left': originalRect.left + 'px',
+                'top': originalRect.top + 'px'
+            });
+            
+            // Đánh dấu item gốc là đang kéo
+            $zodiacDraggedItem.addClass('dragging-original');
+            
+            // Thêm clone vào body
+            $('body').append($zodiacClone);
+            
+            // Thêm sự kiện di chuyển và thả
+            $(document).on('mousemove.zodiac', onZodiacMouseMove);
+            $(document).on('mouseup.zodiac', onZodiacMouseUp);
+        });
+    }
+
+    function onZodiacMouseMove(e) {
+        if (!isZodiacDragging || !$zodiacClone) return;
+        
+        const deltaX = e.clientX - zodiacStartX;
+        const deltaY = e.clientY - zodiacStartY;
+        
+        // Di chuyển clone tự do
+        const originalRect = $zodiacDraggedItem[0].getBoundingClientRect();
+        $zodiacClone.css({
+            'left': originalRect.left + deltaX + 'px',
+            'top': originalRect.top + deltaY + 'px'
+        });
+        
+        // Tính toán vị trí mới trong grid
+        updateDropIndicator(e.clientX, e.clientY);
+    }
+
+    function updateDropIndicator(clientX, clientY) {
+        const $dragDropContent = $('.drag-drop-content');
+        const contentRect = $dragDropContent[0].getBoundingClientRect();
+        
+        // Kiểm tra xem có trong vùng content không
+        if (clientX < contentRect.left || clientX > contentRect.right ||
+            clientY < contentRect.top || clientY > contentRect.bottom) {
+            removeDropIndicator();
+            return;
+        }
+        
+        // Tính toán vị trí trong grid
+        const gridX = clientX - contentRect.left;
+        const gridY = clientY - contentRect.top;
+        
+        const $allBoxes = $('.zodiac-box').not('.dragging-original');
+        const boxWidth = contentRect.width / 4;
+        const boxHeight = boxWidth; // aspect-ratio 1:1
+        
+        const targetCol = Math.floor(gridX / boxWidth);
+        const targetRow = Math.floor(gridY / boxHeight);
+        const targetIndex = targetRow * 4 + targetCol;
+        
+        // Hiển thị indicator tại vị trí mới
+        showDropIndicator(targetIndex);
+    }
+
+    function showDropIndicator(targetIndex) {
+        const $allBoxes = $('.zodiac-box').not('.dragging-original');
+        const $content = $('.drag-drop-content');
+        
+        // Xóa indicator cũ
+        $('.drop-indicator').remove();
+        
+        // Tạo indicator
+        const $indicator = $('<div class="drop-indicator"></div>').css({
+            'position': 'absolute',
+            'border': '2px dashed #627fea',
+            'background-color': 'rgba(98, 127, 234, 0.1)',
+            'border-radius': '8px',
+            'pointer-events': 'none',
+            'z-index': '999'
+        });
+        
+        if (targetIndex >= $allBoxes.length) {
+            // Thêm vào cuối
+            $content.append($indicator);
+        } else {
+            // Chèn vào trước box tại targetIndex
+            $allBoxes.eq(targetIndex).before($indicator);
+        }
+        
+        // Đặt kích thước cho indicator
+        const firstBox = $allBoxes.length > 0 ? $allBoxes[0] : $zodiacDraggedItem[0];
+        if (firstBox) {
+            const rect = firstBox.getBoundingClientRect();
+            $indicator.css({
+                'width': rect.width + 'px',
+                'height': rect.height + 'px'
+            });
+        }
+    }
+
+    function removeDropIndicator() {
+        $('.drop-indicator').remove();
+    }
+
+    function onZodiacMouseUp(e) {
+        if (!isZodiacDragging || !$zodiacDraggedItem || !$zodiacClone) return;
+        
+        const $dragDropContent = $('.drag-drop-content');
+        const contentRect = $dragDropContent[0].getBoundingClientRect();
+        
+        // Kiểm tra xem có trong vùng content không
+        if (e.clientX >= contentRect.left && e.clientX <= contentRect.right &&
+            e.clientY >= contentRect.top && e.clientY <= contentRect.bottom) {
+            
+            // Tính toán vị trí mới
+            const gridX = e.clientX - contentRect.left;
+            const gridY = e.clientY - contentRect.top;
+            
+            const $allBoxes = $('.zodiac-box').not('.dragging-original');
+            const boxWidth = contentRect.width / 4;
+            const boxHeight = boxWidth;
+            
+            const targetCol = Math.floor(gridX / boxWidth);
+            const targetRow = Math.floor(gridY / boxHeight);
+            let targetIndex = targetRow * 4 + targetCol;
+            
+            // Đảm bảo targetIndex hợp lệ
+            targetIndex = Math.min(targetIndex, $allBoxes.length);
+            
+            // Di chuyển item đến vị trí mới
+            if (targetIndex >= $allBoxes.length) {
+                $dragDropContent.append($zodiacDraggedItem);
+            } else {
+                $allBoxes.eq(targetIndex).before($zodiacDraggedItem);
+            }
+        }
+        
+        // Dọn dẹp
+        cleanupZodiacDrag();
+    }
+
+    function cleanupZodiacDrag() {
+        // Xóa clone và indicator
+        $zodiacClone.remove();
+        removeDropIndicator();
+        
+        // Reset styles
+        $zodiacDraggedItem.removeClass('dragging-original');
+        
+        // Reset variables
+        isZodiacDragging = false;
+        $zodiacDraggedItem = null;
+        $zodiacClone = null;
+        originalIndex = -1;
+        
+        // Xóa sự kiện
+        $(document).off('mousemove.zodiac');
+        $(document).off('mouseup.zodiac');
+    }
+
+    // Thêm sự kiện kéo thả cho các box zodiac tồn tại (nếu có)
+    $('.drag-drop-content .zodiac-box').each(function() {
+        addZodiacDragEvents($(this));
     });
 });
