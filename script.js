@@ -52,3 +52,39 @@ document.addEventListener("DOMContentLoaded", () => {
     // Kéo thả bằng giữ chuột ở nút move-btn
     
 });
+
+// Mở hộp thoại đinh dạng văn bản
+$(document).ready(function() {
+    // Khi click vào decorate-box → bật/tắt box tùy chọn
+    $(".decorate-box").on("click", function(e) {
+        e.stopPropagation(); // Ngăn sự kiện lan ra ngoài
+        $(this).find(".decorate-options").toggle();
+    });
+
+    // Khi click ra ngoài → đóng box
+    $(document).on("click", function() {
+        $(".decorate-options").hide();
+    });
+
+    // Khi người dùng chọn checkbox hoặc màu
+    $(".decorate-options input").on("input change", function() {
+        const box = $(this).closest(".decorate-box");
+        const sample = box.find(".sample-text");
+
+        // Lấy giá trị các tùy chọn
+        const bold = box.find(".bold-option").is(":checked");
+        const italic = box.find(".italic-option").is(":checked");
+        const underline = box.find(".underline-option").is(":checked");
+        const bgColor = box.find(".bg-color-picker").val();
+        const textColor = box.find(".text-color-picker").val();
+
+        // Áp dụng style
+        sample.css({
+            "font-weight": bold ? "bold" : "normal",
+            "font-style": italic ? "italic" : "normal",
+            "text-decoration": underline ? "underline" : "none",
+            "background-color": bgColor,
+            "color": textColor
+        });
+    });
+});
