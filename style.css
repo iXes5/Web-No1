@@ -10,7 +10,7 @@
     justify-content: center; 
     width: 100%;
     height: 66px;
-    background: linear-gradient(to top, #7ca6f5, #4e7ad9);
+    background: linear-gradient(to top, #a0c1ff, #6e9aff);
     border-radius: 4px;
     box-shadow: 3px 3px 5px gray;
 }
@@ -28,7 +28,7 @@
 /* Navbar styles */
 .navbar {
     width: 550px;
-    height: 33px;
+    height: 30px;
     justify-self: center;
     background: #c2dbff;
     display: flex;
@@ -37,8 +37,8 @@
     padding: 0;
     margin-top: -12px;
     border-radius: 3px;
-    box-shadow: 0 2px 4px gray;
-    margin-bottom: 20px;
+    box-shadow: 0 0 8px 2px gray;
+    margin-bottom: 10px;
 }
 
 .navbar a {
@@ -64,6 +64,7 @@
     flex-direction: column;
     gap: 5px;
     padding: 8px 0;
+    position: relative; /* Thêm position relative cho kéo thả */
 }
 
 .aside-box {
@@ -72,6 +73,7 @@
     background-color: white;
     overflow: hidden;
     transition: all 0.3s ease;
+    cursor: default; /* Đảm bảo cursor mặc định */
 }
 
 .aside-box-bar {
@@ -131,7 +133,81 @@
 .process-text {
     width: 100%;
     height: 300px;
-    background-color: yellow;
+    background-color: white;
+    border: 1px solid lightgray;
+    display: flex;
+    flex-direction: column;
+}
+
+.process-text-bar {
+    background: linear-gradient(to bottom, #889eed, #627fea);
+    color: #fff7ec;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    user-select: none;
+    font-size: 18px;
+    font-weight: bold;
+    height: 40px;
+    box-sizing: border-box;
+}
+
+.process-text-title {
+    font-size: 18px;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.execute-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.regex-box {
+    width: 200px;
+    height: 24px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    padding: 0 6px;
+    font-size: 12px;
+    background-color: white;
+}
+
+.highlight-btn, .delete-btn, .reset-btn {
+    background-color: #3157e0;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    height: 24px;
+    white-space: nowrap;
+}
+
+.highlight-btn:hover, .delete-btn:hover, .reset-btn:hover {
+    background-color: #3a5fb5;
+}
+
+.decorate-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: 12px;
+}
+
+.process-text-content {
+    flex: 1;
+    padding: 15px;
+    font-size: 18px;
+    line-height: 1.2;
+    color: #333;
+    background-color: white;
+    overflow-y: auto;
+    text-align: justify;
 }
 
 .drag-drop {
@@ -209,3 +285,4 @@
 .footer-menu a:last-child::after {
     display: none;
 }
+
