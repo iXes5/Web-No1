@@ -251,6 +251,7 @@ $(document).ready(function() {
     // Lưu nội dung gốc để reset
     const originalContent = $('.process-text-content').html();
 
+    // ===== CHỨC NĂNG XỬ LÝ TEXT (HIGHLIGHT) =====
     $('.highlight-btn').on('click', function() {
         const regexText = $('.regex-box').val();
         if (!regexText) {
@@ -259,12 +260,12 @@ $(document).ready(function() {
         }
         
         try {
-            const regex = new RegExp(regexText, 'g');
+            const regex = new RegExp(regexText, 'gi');
             const $content = $('.process-text-content');
             let content = $content.html();
             
-            // LỖI: Không loại bỏ các highlight cũ trước khi highlight mới
-            // content = content.replace(/<span class="highlighted"[^>]*>(.*?)<\/span>/gi, '$1');
+            // Loại bỏ các highlight cũ để tránh chồng chất
+            content = content.replace(/<span class="highlighted"[^>]*>(.*?)<\/span>/gi, '$1');
             
             // Highlight text với style hiện tại từ decoration
             content = content.replace(regex, match => 
