@@ -317,4 +317,31 @@ $(document).ready(function() {
         // Cập nhật lại sample text
         updateSampleTextStyle();
     });
+
+    // ===== NGĂN CHẶN SELECTION KHI KÉO THẢ =====
+    $('.move-btn, .aside-box-bar').on('selectstart', function(e) {
+        e.preventDefault();
+    });
+
+    // ===== CHỨC NĂNG ZODIAC DRAG & DROP =====
+    let isZodiacDragging = false;
+    let $zodiacDraggedItem = null;
+    let $zodiacClone = null;
+    let zodiacStartX = 0;
+    let zodiacStartY = 0;
+    let originalIndex = -1;
+
+    // Thêm box zodiac mới
+    $('.add-zodiac-btn').on('click', function() {
+        const selectedZodiac = $('.zodiac-select').val();
+        const zodiacEmoji = $('.zodiac-select option:selected').html();
+        
+        // Tạo box zodiac mới
+        const $zodiacBox = $('<div class="zodiac-box"></div>')
+            .attr('data-zodiac', selectedZodiac)
+            .html(`<span class="zodiac-emoji">${zodiacEmoji}</span>`);
+        
+        // Thêm vào content (cuối cùng)
+        $('.drag-drop-content').append($zodiacBox);
+    });
 });
