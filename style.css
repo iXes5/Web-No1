@@ -409,6 +409,45 @@
     opacity: 0.3;
 }
 
+/* placeholder và clone styles */
+.zodiac-placeholder {
+  border: 2px dashed #bbb;
+  border-radius: 10px;
+  background: transparent;
+  opacity: 0.7;
+  transition: all 0.12s ease;
+  box-sizing: border-box;
+}
+.zodiac-clone {
+  user-select: none;
+  pointer-events: none;
+}
+
+.zodiac-clone {
+  user-select: none;
+  pointer-events: none;
+  transition: transform 0.15s ease, left 0.15s ease, top 0.15s ease;
+  will-change: transform, left, top;
+}
+
+/* Khi placeholder thay đổi vị trí */
+.zodiac-placeholder {
+  border: 2px dashed #bbb;
+  border-radius: 10px;
+  background: transparent;
+  opacity: 0.7;
+  box-sizing: border-box;
+  transition: all 0.25s ease; /* mượt khi di chuyển giữa các ô */
+}
+
+/* Khi phần tử thả vào chỗ mới, cho nó một hiệu ứng bật nhẹ */
+.zodiac-box {
+  transition: transform 0.25s ease, opacity 0.2s ease;
+}
+.zodiac-box.dropped {
+  transform: scale(1.1);
+}
+
 .footer {
     width: 100%;
     height: 33px;
