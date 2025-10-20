@@ -411,7 +411,7 @@
 
 /* placeholder và clone styles */
 .zodiac-placeholder {
-  border: 2px dashed #bbb;
+  border: 2px dashed #9f9e9e;
   border-radius: 10px;
   background: transparent;
   opacity: 0.7;
