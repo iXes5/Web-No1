@@ -331,17 +331,37 @@ $(document).ready(function() {
     let zodiacStartY = 0;
     let originalIndex = -1;
 
+    // Danh sách tên con giáp tiếng Anh
+    const zodiacNames = {
+        rat: "Mouse",
+        ox: "Buffalo",
+        tiger: "Tiger",
+        cat: "Cat",
+        dragon: "Dragon",
+        snake: "Snake",
+        horse: "Horse",
+        goat: "Goat",
+        monkey: "Monkey",
+        rooster: "Rooster",
+        dog: "Dog",
+        pig: "Pig"
+    };
+
     // Thêm box zodiac mới
     $('.add-zodiac-btn').on('click', function() {
         const selectedZodiac = $('.zodiac-select').val();
         const zodiacEmoji = $('.zodiac-select option:selected').html();
-        
-        // Tạo box zodiac mới
-        const $zodiacBox = $('<div class="zodiac-box"></div>')
-            .attr('data-zodiac', selectedZodiac)
-            .html(`<span class="zodiac-emoji">${zodiacEmoji}</span>`);
-        
-        // Thêm vào content (cuối cùng)
+        const zodiacName = zodiacNames[selectedZodiac] || selectedZodiac;
+
+        // Tạo box zodiac mới với emoji + tên
+        const $zodiacBox = $(`
+            <div class="zodiac-box" data-zodiac="${selectedZodiac}">
+                <div class="zodiac-emoji">${zodiacEmoji}</div>
+                <div class="zodiac-name">${zodiacName}</div>
+            </div>
+        `);
+
+        // Thêm vào content
         $('.drag-drop-content').append($zodiacBox);
     });
 });

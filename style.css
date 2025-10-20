@@ -349,35 +349,34 @@
 }
 
 .zodiac-box {
-    width: 100%;
-    aspect-ratio: 1;
-    border: 2px solid #627fea;
-    border-radius: 8px;
     display: flex;
-    align-items: center;
+    flex-direction: column;
     justify-content: center;
-    font-size: 40px;
-    background-color: #f0f4ff;
+    align-items: center;
+    height: 80px;
+    border-radius: 8px;
+    background-color: #1a3c8b; /* xanh đậm */
+    color: white;
+    font-weight: bold;
     cursor: move;
-    transition: all 0.2s ease;
-    position: relative;
+    transition: transform 0.2s ease;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    user-select: none;
 }
 
 .zodiac-box:hover {
-    background-color: #e1e8ff;
     transform: scale(1.05);
-}
-
-.zodiac-dragging-clone {
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-    transform: scale(1.1);
-    transition: none;
-    border: 2px dashed #627fea;
+    background-color: #274fae; /* xanh sáng hơn khi hover */
 }
 
 .zodiac-emoji {
-    user-select: none;
-    pointer-events: none;
+    font-size: 32px;
+    margin-bottom: 4px;
+}
+
+.zodiac-name {
+    font-size: 15px;
+    letter-spacing: 0.5px;
 }
 
 /* Ngăn chặn selection khi kéo */
