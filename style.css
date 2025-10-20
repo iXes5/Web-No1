@@ -341,11 +341,12 @@
 /* Zodiac box styles */
 .drag-drop-content {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     gap: 8px;
     padding: 25px;
     min-height: 200px;
     position: relative;
+    align-content: start;
 }
 
 .zodiac-box {
@@ -354,7 +355,6 @@
     align-items: center;
     justify-content: stretch;
     width: 100%;
-    height: 100px;
     overflow: hidden; 
     cursor: pointer;
     transition: transform 0.2s ease;
@@ -365,15 +365,16 @@
 .zodiac-icon-box {
     flex: 2;
     width: 100%;
-    height: 100%;
-    background: radial-gradient(circle at center, #4c7be0 0%, #1a3c8b 100%);
+    background: radial-gradient(circle at center, #527fe1 25%, #1a3c8b 100%);
+    border-radius: 3px;
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 15px 0;
 }
 
 .zodiac-emoji {
-    font-size: 40px;
+    font-size: 50px;
     color: white;
     user-select: none;
 }
@@ -393,8 +394,8 @@
     font-weight: 200;
     color: black;
     letter-spacing: 0.5px;
+    padding: 8px 0;
 }
-
 
 /* Ngăn chặn selection khi kéo */
 .zodiac-box {
