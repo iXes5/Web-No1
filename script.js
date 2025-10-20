@@ -218,4 +218,32 @@ $(document).ready(function() {
             'color': currentTextColor
         });
     }
+
+    // Xử lý thay đổi màu chữ
+    $(document).on('input change', '.text-color-picker', function() {
+        currentTextColor = $(this).val();
+        updateSampleTextStyle();
+    });
+
+    // Xử lý thay đổi màu nền
+    $(document).on('input change', '.bg-color-picker', function() {
+        currentBgColor = $(this).val();
+        updateSampleTextStyle();
+    });
+
+    // Xử lý thay đổi style chữ (bold, italic, underline)
+    $(document).on('change', '.bold-option', function() {
+        currentFontWeight = $(this).is(':checked') ? 'bold' : 'normal';
+        updateSampleTextStyle();
+    });
+
+    $(document).on('change', '.italic-option', function() {
+        currentFontStyle = $(this).is(':checked') ? 'italic' : 'normal';
+        updateSampleTextStyle();
+    });
+
+    $(document).on('change', '.underline-option', function() {
+        currentTextDecoration = $(this).is(':checked') ? 'underline' : 'none';
+        updateSampleTextStyle();
+    });
 });
