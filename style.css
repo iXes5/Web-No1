@@ -308,7 +308,34 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-left: 400px;
+    margin-left: 350px;
+}
+
+.zodiac-select {
+    padding: 5px 12px;
+    border-radius: 2px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    background-color: white;
+    cursor: pointer;
+    border: 2px solid #1032ae;
+}
+
+.zodiac-controls .add-zodiac-btn {
+    background: #3157e0;
+    color: #fff;
+    border: none;
+    padding: 7px 12px;
+    border-radius: 18px;
+    font-weight: 600;
+    box-shadow: 0 4px 10px rgba(43,120,230,0.18);
+    cursor: pointer;
+    transition: transform 0.08s ease, box-shadow 0.12s ease;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0 8px;
 }
 
 /* Zodiac box styles */
