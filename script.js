@@ -1,6 +1,6 @@
 // script.js — toàn bộ logic (jQuery required)
 $(document).ready(function() {
-    // ===== NAVBAR <-> FOOTER HOVER =====
+    // NAVBAR <-> FOOTER HOVER
     const $navbarMenus = $('.navbar a');
     const $footerMenus = $('.footer-menu a');
 
@@ -26,7 +26,7 @@ $(document).ready(function() {
         });
     });
 
-    // ===== ASIDE: TOGGLE CONTENT =====
+    // ASIDE: TOGGLE CONTENT
     $(document).on('click', '.aside-box .toggle-btn', function(e) {
         e.stopPropagation();
         const $box = $(this).closest('.aside-box');
@@ -34,7 +34,7 @@ $(document).ready(function() {
         $(this).text($box.hasClass('closed') ? '►' : '↓');
     });
 
-    // ===== ASIDE: DRAG TO REORDER (vertical drag by move-btn) =====
+    // ASIDE: DRAG TO REORDER (vertical drag by move-btn)
     let isDraggingAside = false;
     let $asideDragged = null;
     let $asideClone = null;
@@ -124,7 +124,7 @@ $(document).ready(function() {
         $(document).off('mouseup.aside');
     }
 
-    // ===== TEXT DECORATION (sample box, color pickers, options) =====
+    // TEXT DECORATION (sample box, color pickers, options)
     let currentTextColor = '#333333';
     let currentBgColor = '#ffffff';
     let currentFontWeight = 'normal';
@@ -181,7 +181,7 @@ $(document).ready(function() {
         updateSampleTextStyle();
     });
 
-    // ===== TEXT PROCESSING (highlight, delete, reset) =====
+    // TEXT PROCESSING (highlight, delete, reset)
     const originalContent = $('.process-text-content').html();
 
     $('.highlight-btn').on('click', function() {
@@ -233,7 +233,7 @@ $(document).ready(function() {
         updateSampleTextStyle();
     });
 
-    // ===== DRAG & DROP ZODIAC (clone as visible item + placeholder) =====
+    // DRAG & DROP ZODIAC (clone as visible item + placeholder)
     let isZodiacDragging = false;
     let $zodiacDraggedItem = null;
     let $zodiacClone = null;
@@ -370,7 +370,7 @@ $(document).ready(function() {
         $(document).off('mouseup.zodiac', onZodiacMouseUp);
     }
 
-    // ===== ADD NEW ZODIAC BOX =====
+    // ADD NEW ZODIAC BOX
     $('.add-zodiac-btn').on('click', function() {
         const selectedZodiac = $('.zodiac-select').val();
         const zodiacEmoji = $('.zodiac-select option:selected').html();
@@ -397,7 +397,7 @@ $(document).ready(function() {
 
     // ensure existing boxes are draggable (delegated handler covers them)
 
-    // ===== SAFETY: cancel drag if user presses Escape =====
+    // SAFETY: cancel drag if user presses Escape
     $(document).on('keydown', function(e) {
         if (e.key === 'Escape' && isZodiacDragging) {
             // return item to original place
@@ -418,7 +418,7 @@ $(document).ready(function() {
     });
 }); // end document.ready
 
-// ===== RESPONSIVE SUPPORT =====
+// RESPONSIVE SUPPORT
 function handleResponsiveLayout() {
     const isMobile = window.innerWidth <= 576;
     
