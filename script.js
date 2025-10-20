@@ -89,8 +89,8 @@ $(document).ready(function() {
             'box-sizing': 'border-box'
         });
         
-        // Ẩn item gốc
-        $draggedItem.css('opacity', '0.3');
+        // Ẩn item gốc nhẹ đi để vẫn giữ chỗ trong layout
+        $draggedItem.addClass('dragging-original').css('opacity', '0.3');
         
         // Thêm clone vào body
         $('body').append($clone);
@@ -105,7 +105,7 @@ $(document).ready(function() {
         
         const deltaY = e.clientY - startY;
         
-        // Tính toán vị trí mới - không giới hạn phạm vi
+        // Tính toán vị trí mới
         const newTop = startTop + deltaY;
 
         // Lấy thông tin khung aside
@@ -127,43 +127,38 @@ $(document).ready(function() {
 
     function onMouseUp() {
         if (!isDragging || !$draggedItem || !$clone) return;
-        
+
         const finalTop = $clone.offset().top;
         const $aside = $('.aside');
-        const $allBoxes = $('.aside-box').not($draggedItem);
-        let newPosition = null;
-        
-        // Tìm vị trí mới để chèn dựa trên vị trí clone
-        $allBoxes.each(function() {
+
+        // TÌM VỊ TRÍ MỚI: duyệt các box khác (không bao gồm item đang kéo)
+        const $otherBoxes = $aside.find('.aside-box').not($draggedItem);
+        let inserted = false;
+
+        $otherBoxes.each(function() {
             const $box = $(this);
             const boxTop = $box.offset().top;
             const boxHeight = $box.outerHeight();
             const boxMiddle = boxTop + boxHeight / 2;
-            
+
             if (finalTop < boxMiddle) {
-                newPosition = $box;
+                $box.before($draggedItem);
+                inserted = true;
                 return false; // break loop
             }
         });
-        
-        // Di chuyển item đến vị trí mới
-        if (newPosition) {
-            newPosition.before($draggedItem);
-        } else {
-            // Nếu không tìm thấy vị trí phù hợp, thêm vào cuối
+
+        // Nếu không tìm thấy vị trí phù hợp thì append vào cuối aside
+        if (!inserted) {
             $aside.append($draggedItem);
         }
-        
-        // Xóa clone và reset styles
+
+        // Dọn dẹp: loại bỏ clone, phục hồi style gốc
         $clone.remove();
-        $draggedItem.css('opacity', '');
-        
-        // Reset variables
+        $draggedItem.removeClass('dragging-original').css('opacity', '');
         isDragging = false;
         $draggedItem = null;
         $clone = null;
-        
-        // Xóa sự kiện
         $(document).off('mousemove.drag');
         $(document).off('mouseup.drag');
     }
