@@ -52,16 +52,6 @@ $(document).ready(function() {
         $btn.text($box.hasClass('closed') ? '►' : '↓');
     });
 
-    // ===== CHỨC NĂNG ĐÓNG/MỞ NEWS BOX =====
-    $('.aside-box .toggle-btn').on('click', function(e) {
-        e.stopPropagation();
-        const $box = $(this).closest('.aside-box');
-        const $btn = $(this);
-        
-        $box.toggleClass('closed');
-        $btn.text($box.hasClass('closed') ? '►' : '↓');
-    });
-
     // ===== CHỨC NĂNG KÉO THẢ NEWS BOX =====
     let isDragging = false;
     let $draggedItem = null;
@@ -188,19 +178,23 @@ $(document).ready(function() {
     // Mở/đóng hộp thoại decoration
     $(document).on('click', '.decorate-icon', function(e) {
         e.stopPropagation();
-        const $options = $(this).siblings('.decorate-options');
+        const $decorateBox = $(this).closest('.decorate-box');
+        const $options = $decorateBox.find('.decorate-options');
         
-        // Đóng tất cả hộp thoại khác
+        // Đóng tất cả hộp thoại khác và xóa class show-options
+        $('.decorate-box').not($decorateBox).removeClass('show-options');
         $('.decorate-options').not($options).hide();
         
-        // Toggle hộp thoại hiện tại
+        // Toggle hộp thoại hiện tại và class show-options
         $options.toggle();
+        $decorateBox.toggleClass('show-options', $options.is(':visible'));
     });
 
     // Đóng khi click ra ngoài
     $(document).on('click', function(e) {
         if (!$(e.target).closest('.decorate-box').length) {
             $('.decorate-options').hide();
+            $('.decorate-box').removeClass('show-options');
         }
     });
 
@@ -247,11 +241,10 @@ $(document).ready(function() {
         updateSampleTextStyle();
     });
 
-    // ===== CHỨC NĂNG XỬ LÝ TEXT (HIGHLIGHT) =====
+    // ===== CHỨC NĂNG XỬ LÝ TEXT (HIGHLIGHT, DELETE, RESET) =====
     // Lưu nội dung gốc để reset
     const originalContent = $('.process-text-content').html();
 
-    // ===== CHỨC NĂNG XỬ LÝ TEXT (HIGHLIGHT) =====
     $('.highlight-btn').on('click', function() {
         const regexText = $('.regex-box').val();
         if (!regexText) {
@@ -279,7 +272,6 @@ $(document).ready(function() {
         }
     });
 
-    // ===== CHỨC NĂNG XỬ LÝ TEXT (DELETE) =====
     $('.delete-btn').on('click', function() {
         const regexText = $('.regex-box').val();
         if (!regexText) {
@@ -305,7 +297,6 @@ $(document).ready(function() {
         }
     });
 
-    // ===== CHỨC NĂNG XỬ LÝ TEXT (RESET) =====
     $('.reset-btn').on('click', function() {
         // Reset về nội dung gốc
         $('.process-text-content').html(originalContent);
