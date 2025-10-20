@@ -368,8 +368,7 @@ $(document).ready(function() {
                 'opacity': '0.9',
                 'pointer-events': 'none',
                 'left': originalRect.left + 'px',
-                'top': originalRect.top + 'px',
-                'transform': 'rotate(5deg)'
+                'top': originalRect.top + 'px'
             });
             
             // Đánh dấu item gốc là đang kéo
@@ -391,13 +390,11 @@ $(document).ready(function() {
         const deltaY = e.clientY - zodiacStartY;
         
         // Di chuyển clone
+        const originalRect = $zodiacDraggedItem[0].getBoundingClientRect();
         $zodiacClone.css({
-            'left': parseInt($zodiacClone.css('left')) + deltaX + 'px',
-            'top': parseInt($zodiacClone.css('top')) + deltaY + 'px'
+            'left': originalRect.left + deltaX + 'px',
+            'top': originalRect.top + deltaY + 'px'
         });
-        
-        zodiacStartX = e.clientX;
-        zodiacStartY = e.clientY;
     }
 
     function onZodiacMouseUp(e) {
@@ -411,7 +408,7 @@ $(document).ready(function() {
                         e.clientY >= contentRect.top && e.clientY <= contentRect.bottom;
         
         if (isInContent) {
-            // Tính toán vị trí mới dựa trên tất cả boxes (kể cả item đang kéo)
+            // Tính toán vị trí mới - FIX: chỉ tính toán dựa trên phần icon box
             const $allBoxes = getAllZodiacBoxes();
             const cols = getGridColumnCount($dragDropContent);
             const boxWidth = contentRect.width / cols;
@@ -420,11 +417,29 @@ $(document).ready(function() {
             const gridY = e.clientY - contentRect.top;
             
             const targetCol = Math.floor(gridX / boxWidth);
-            const targetRow = Math.floor(gridY / boxWidth); // Sử dụng boxWidth cho cả chiều cao
+            const targetRow = Math.floor(gridY / boxWidth); // Sử dụng boxWidth cho cả chiều cao để đồng bộ
+            
             let targetIndex = targetRow * cols + targetCol;
             
+            // FIX: Điều chỉnh targetIndex dựa trên vị trí chuột trong box
+            // Lấy box tại vị trí target để xác định vùng click
+            const $targetBoxes = $allBoxes.not('.dragging-original');
+            if (targetIndex < $targetBoxes.length) {
+                const $potentialTarget = $targetBoxes.eq(targetIndex);
+                const targetRect = $potentialTarget[0].getBoundingClientRect();
+                
+                // Tính tỷ lệ vị trí chuột trong box (0 đến 1)
+                const relativeY = (e.clientY - targetRect.top) / targetRect.height;
+                
+                // Nếu click ở nửa trên của box, giữ nguyên targetIndex
+                // Nếu click ở nửa dưới của box, tăng targetIndex lên 1
+                if (relativeY > 0.5) {
+                    targetIndex = Math.min(targetIndex + 1, $targetBoxes.length);
+                }
+            }
+            
             // Giới hạn targetIndex trong phạm vi hợp lệ
-            targetIndex = Math.max(0, Math.min(targetIndex, $allBoxes.length - 1));
+            targetIndex = Math.max(0, Math.min(targetIndex, $targetBoxes.length));
             
             // Chỉ di chuyển nếu vị trí thay đổi
             if (targetIndex !== originalIndex) {
@@ -432,20 +447,10 @@ $(document).ready(function() {
                 $zodiacDraggedItem.detach();
                 
                 // Chèn vào vị trí mới
-                if (targetIndex === 0) {
-                    // Chèn vào đầu
-                    $dragDropContent.prepend($zodiacDraggedItem);
-                } else if (targetIndex >= $allBoxes.length - 1) {
-                    // Chèn vào cuối (trừ item đang kéo)
+                if (targetIndex >= $targetBoxes.length) {
                     $dragDropContent.append($zodiacDraggedItem);
                 } else {
-                    // Chèn vào giữa
-                    const $targetBox = getAllZodiacBoxes().eq(targetIndex);
-                    if ($targetBox.length) {
-                        $targetBox.before($zodiacDraggedItem);
-                    } else {
-                        $dragDropContent.append($zodiacDraggedItem);
-                    }
+                    $targetBoxes.eq(targetIndex).before($zodiacDraggedItem);
                 }
             }
         }
