@@ -292,10 +292,11 @@ $(document).ready(function() {
             const $content = $('.process-text-content');
             let content = $content.html();
             
-            // LỖI: Không escape regexText để tránh lỗi khi có ký tự đặc biệt
-            const escapedRegexText = regexText; // THIẾU xử lý escape
+            // Escape regexText để tránh lỗi khi có ký tự đặc biệt trong regex
+            const escapedRegexText = regexText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
             
-            content = content.replace(new RegExp(`<span class="highlighted"[^>]*>(${escapedRegexText})<\/span>`, 'g'), '');
+            // LỖI: Pattern regex cho highlight text không chính xác
+            content = content.replace(new RegExp(`<span class="highlighted"[^>]*>${escapedRegexText}<\/span>`, 'g'), '');
             content = content.replace(regex, '');
             
             $content.html(content);
