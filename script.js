@@ -278,4 +278,29 @@ $(document).ready(function() {
             console.log('Regex không hợp lệ! Vui lòng kiểm tra lại.');
         }
     });
+
+    // ===== CHỨC NĂNG XỬ LÝ TEXT (DELETE) =====
+    $('.delete-btn').on('click', function() {
+        const regexText = $('.regex-box').val();
+        if (!regexText) {
+            console.log('Vui lòng nhập regex!');
+            return;
+        }
+        
+        try {
+            const regex = new RegExp(regexText, 'g');
+            const $content = $('.process-text-content');
+            let content = $content.html();
+            
+            // LỖI: Không escape regexText để tránh lỗi khi có ký tự đặc biệt
+            const escapedRegexText = regexText; // THIẾU xử lý escape
+            
+            content = content.replace(new RegExp(`<span class="highlighted"[^>]*>(${escapedRegexText})<\/span>`, 'g'), '');
+            content = content.replace(regex, '');
+            
+            $content.html(content);
+        } catch (e) {
+            console.log('Regex không hợp lệ! Vui lòng kiểm tra lại.');
+        }
+    });
 });
