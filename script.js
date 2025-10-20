@@ -1,513 +1,420 @@
-// Toàn bộ chức năng sử dụng jQuery
+// script.js — toàn bộ logic (jQuery required)
 $(document).ready(function() {
-    // ===== HIỆU ỨNG HOVER NAVBAR VÀ FOOTER =====
-    const $navbarMenus = $('.navbar a');
-    const $footerMenus = $('.footer-menu a');
-    
-    // Hover navbar ảnh hưởng footer
-    $navbarMenus.each(function(index) {
-        $(this).on('mouseover', function() {
-            $footerMenus.eq(index).css({
-                'color': '#ffdfb3',
-                'background-color': '#ff8407'
-            });
-            $(this).css('color', 'orange');
-        });
-        
-        $(this).on('mouseout', function() {
-            $footerMenus.eq(index).css({
-                'color': '#ff8407',
-                'background-color': '#ffdfb3'
-            });
-            $(this).css('color', '#003366');
-        });
-    });
-    
-    // Hover footer ảnh hưởng navbar
-    $footerMenus.each(function(index) {
-        $(this).on('mouseover', function() {
-            $navbarMenus.eq(index).css('color', 'orange');
-            $(this).css({
-                'color': '#ffdfb3',
-                'background-color': '#ff8407'
-            });
-        });
-        
-        $(this).on('mouseout', function() {
-            $navbarMenus.eq(index).css('color', '#003366');
-            $(this).css({
-                'color': '#ff8407',
-                'background-color': '#ffdfb3'
-            });
-        });
-    });
+  // ===== NAVBAR <-> FOOTER HOVER =====
+  const $navbarMenus = $('.navbar a');
+  const $footerMenus = $('.footer-menu a');
 
-    // ===== CHỨC NĂNG ĐÓNG/MỞ NEWS BOX =====
-    $('.aside-box .toggle-btn').on('click', function(e) {
-        e.stopPropagation();
-        const $box = $(this).closest('.aside-box');
-        const $btn = $(this);
-        
-        $box.toggleClass('closed');
-        $btn.text($box.hasClass('closed') ? '►' : '↓');
+  $navbarMenus.each(function(index) {
+    $(this).on('mouseover', function() {
+      $footerMenus.eq(index).css({'color': '#ffdfb3','background-color': '#ff8407'});
+      $(this).css('color', 'orange');
     });
+    $(this).on('mouseout', function() {
+      $footerMenus.eq(index).css({'color': '#ff8407','background-color': '#ffdfb3'});
+      $(this).css('color', '#003366');
+    });
+  });
 
-    // ===== CHỨC NĂNG KÉO THẢ NEWS BOX =====
-    let isDragging = false;
-    let $draggedItem = null;
-    let $clone = null;
-    let startY = 0;
-    let startTop = 0;
+  $footerMenus.each(function(index) {
+    $(this).on('mouseover', function() {
+      $navbarMenus.eq(index).css('color', 'orange');
+      $(this).css({'color': '#ffdfb3','background-color': '#ff8407'});
+    });
+    $(this).on('mouseout', function() {
+      $navbarMenus.eq(index).css('color', '#003366');
+      $(this).css({'color': '#ff8407','background-color': '#ffdfb3'});
+    });
+  });
 
-    // Xử lý kéo thả
-    $('.move-btn').on('mousedown', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        isDragging = true;
-        $draggedItem = $(this).closest('.aside-box');
-        startY = e.clientY;
-        startTop = $draggedItem.offset().top;
-        
-        // Lấy vị trí và kích thước của aside
-        const $aside = $('.aside');
-        const asideOffset = $aside.offset();
-        const asideLeft = asideOffset.left;
-        const asideWidth = $aside.width();
-        
-        // Tạo clone
-        $clone = $draggedItem.clone();
-        $clone.addClass('dragging-clone').css({
-            'position': 'absolute',
-            'z-index': '1000',
-            'width': asideWidth + 'px',
-            'opacity': '0.8',
-            'pointer-events': 'none',
-            'left': asideLeft + 'px',
-            'top': startTop + 'px',
-            'margin': '0',
-            'box-sizing': 'border-box'
-        });
-        
-        // Ẩn item gốc nhẹ đi để vẫn giữ chỗ trong layout
-        $draggedItem.addClass('dragging-original').css('opacity', '0.3');
-        
-        // Thêm clone vào body
-        $('body').append($clone);
-        
-        // Thêm sự kiện di chuyển và thả
-        $(document).on('mousemove.drag', onMouseMove);
-        $(document).on('mouseup.drag', onMouseUp);
+  // ===== ASIDE: TOGGLE CONTENT =====
+  $(document).on('click', '.aside-box .toggle-btn', function(e) {
+    e.stopPropagation();
+    const $box = $(this).closest('.aside-box');
+    $box.toggleClass('closed');
+    $(this).text($box.hasClass('closed') ? '►' : '↓');
+  });
+
+  // ===== ASIDE: DRAG TO REORDER (vertical drag by move-btn) =====
+  let isDraggingAside = false;
+  let $asideDragged = null;
+  let $asideClone = null;
+  let asideStartY = 0;
+  let asideStartTop = 0;
+
+  $(document).on('mousedown', '.aside-box .move-btn', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    isDraggingAside = true;
+    $asideDragged = $(this).closest('.aside-box');
+    asideStartY = e.clientY;
+    asideStartTop = $asideDragged.offset().top;
+
+    const $aside = $('.aside');
+    const asideOffset = $aside.offset();
+    const asideLeft = asideOffset.left;
+    const asideWidth = $aside.width();
+
+    $asideClone = $asideDragged.clone();
+    $asideClone.addClass('dragging-clone').css({
+      position: 'absolute',
+      zIndex: 2000,
+      width: asideWidth + 'px',
+      opacity: 0.9,
+      pointerEvents: 'none',
+      left: asideLeft + 'px',
+      top: asideStartTop + 'px',
+      margin: 0,
+      boxSizing: 'border-box'
     });
 
-    function onMouseMove(e) {
-        if (!isDragging || !$clone) return;
-        
-        const deltaY = e.clientY - startY;
-        
-        // Tính toán vị trí mới
-        const newTop = startTop + deltaY;
+    $asideDragged.addClass('dragging-original').css('opacity', '0.3');
+    $('body').append($asideClone);
 
-        // Lấy thông tin khung aside
-        const $aside = $('.aside');
-        const asideTop = $aside.offset().top;
-        const asideHeight = $aside.outerHeight();
-        const cloneHeight = $clone.outerHeight();
+    $(document).on('mousemove.aside', onAsideMouseMove);
+    $(document).on('mouseup.aside', onAsideMouseUp);
+  });
 
-        // Giới hạn vị trí top
-        const minTop = asideTop;
-        const maxTop = asideTop + asideHeight - cloneHeight;
+  function onAsideMouseMove(e) {
+    if (!isDraggingAside || !$asideClone) return;
+    const deltaY = e.clientY - asideStartY;
+    const newTop = asideStartTop + deltaY;
 
-        // Ràng buộc vị trí
-        const boundedTop = Math.min(Math.max(newTop, minTop), maxTop);
+    const $aside = $('.aside');
+    const asideTop = $aside.offset().top;
+    const asideHeight = $aside.outerHeight();
+    const cloneHeight = $asideClone.outerHeight();
 
-        // Cập nhật vị trí clone
-        $clone.css('top', boundedTop + 'px');
+    const minTop = asideTop;
+    const maxTop = asideTop + asideHeight - cloneHeight;
+    const boundedTop = Math.min(Math.max(newTop, minTop), maxTop);
+
+    $asideClone.css('top', boundedTop + 'px');
+  }
+
+  function onAsideMouseUp() {
+    if (!isDraggingAside || !$asideDragged || !$asideClone) return;
+    const finalTop = $asideClone.offset().top;
+    const cloneHeight = $asideClone.outerHeight();
+    const finalCenter = finalTop + cloneHeight / 2;
+
+    const $aside = $('.aside');
+    const $otherBoxes = $aside.find('.aside-box').not($asideDragged);
+    let inserted = false;
+
+    $otherBoxes.each(function() {
+      const $box = $(this);
+      const boxTop = $box.offset().top;
+      const boxHeight = $box.outerHeight();
+      const boxMiddle = boxTop + boxHeight / 2;
+      if (finalCenter < boxMiddle) {
+        $box.before($asideDragged);
+        inserted = true;
+        return false;
+      }
+    });
+
+    if (!inserted) $aside.append($asideDragged);
+
+    $asideClone.remove();
+    $asideDragged.removeClass('dragging-original').css('opacity', '');
+    isDraggingAside = false;
+    $asideDragged = null;
+    $asideClone = null;
+    $(document).off('mousemove.aside');
+    $(document).off('mouseup.aside');
+  }
+
+  // ===== TEXT DECORATION (sample box, color pickers, options) =====
+  let currentTextColor = '#333333';
+  let currentBgColor = '#ffffff';
+  let currentFontWeight = 'normal';
+  let currentFontStyle = 'normal';
+  let currentTextDecoration = 'none';
+
+  $(document).on('click', '.decorate-icon', function(e) {
+    e.stopPropagation();
+    const $decorateBox = $(this).closest('.decorate-box');
+    const $options = $decorateBox.find('.decorate-options');
+    $('.decorate-box').not($decorateBox).removeClass('show-options');
+    $('.decorate-options').not($options).hide();
+    $options.toggle();
+    $decorateBox.toggleClass('show-options', $options.is(':visible'));
+  });
+
+  $(document).on('click', function(e) {
+    if (!$(e.target).closest('.decorate-box').length) {
+      $('.decorate-options').hide();
+      $('.decorate-box').removeClass('show-options');
+    }
+  });
+
+  function updateSampleTextStyle() {
+    const $box = $('.decorate-box');
+    const $sample = $box.find('.sample-text');
+    $sample.css({
+      'font-weight': currentFontWeight,
+      'font-style': currentFontStyle,
+      'text-decoration': currentTextDecoration,
+      'background-color': currentBgColor,
+      'color': currentTextColor
+    });
+  }
+
+  $(document).on('input change', '.text-color-picker', function() {
+    currentTextColor = $(this).val();
+    updateSampleTextStyle();
+  });
+  $(document).on('input change', '.bg-color-picker', function() {
+    currentBgColor = $(this).val();
+    updateSampleTextStyle();
+  });
+  $(document).on('change', '.bold-option', function() {
+    currentFontWeight = $(this).is(':checked') ? 'bold' : 'normal';
+    updateSampleTextStyle();
+  });
+  $(document).on('change', '.italic-option', function() {
+    currentFontStyle = $(this).is(':checked') ? 'italic' : 'normal';
+    updateSampleTextStyle();
+  });
+  $(document).on('change', '.underline-option', function() {
+    currentTextDecoration = $(this).is(':checked') ? 'underline' : 'none';
+    updateSampleTextStyle();
+  });
+
+  // ===== TEXT PROCESSING (highlight, delete, reset) =====
+  const originalContent = $('.process-text-content').html();
+
+  $('.highlight-btn').on('click', function() {
+    const regexText = $('.regex-box').val();
+    if (!regexText) { console.log('Vui lòng nhập regex!'); return; }
+    try {
+      const regex = new RegExp(regexText, 'g');
+      const $content = $('.process-text-content');
+      let content = $content.html();
+      content = content.replace(/<span class="highlighted"[^>]*>(.*?)<\/span>/gi, '$1');
+      content = content.replace(regex, match =>
+        `<span class="highlighted" style="font-weight: ${currentFontWeight}; font-style: ${currentFontStyle}; text-decoration: ${currentTextDecoration}; background-color: ${currentBgColor}; color: ${currentTextColor};">${match}</span>`
+      );
+      $content.html(content);
+    } catch (e) {
+      console.log('Regex không hợp lệ! Vui lòng kiểm tra lại.');
+    }
+  });
+
+  $('.delete-btn').on('click', function() {
+    const regexText = $('.regex-box').val();
+    if (!regexText) { console.log('Vui lòng nhập regex!'); return; }
+    try {
+      const regex = new RegExp(regexText, 'g');
+      const $content = $('.process-text-content');
+      let content = $content.html();
+
+      // Remove highlighted and plain matches
+      const escapedRegexText = regexText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      content = content.replace(new RegExp(`<span class="highlighted"[^>]*>(${escapedRegexText})<\/span>`, 'g'), '');
+      content = content.replace(regex, '');
+      $content.html(content);
+    } catch (e) {
+      console.log('Regex không hợp lệ! Vui lòng kiểm tra lại.');
+    }
+  });
+
+  $('.reset-btn').on('click', function() {
+    $('.process-text-content').html(originalContent);
+    $('.regex-box').val('');
+    currentTextColor = '#333333';
+    currentBgColor = '#ffffff';
+    currentFontWeight = 'normal';
+    currentFontStyle = 'normal';
+    currentTextDecoration = 'none';
+    $('.bold-option, .italic-option, .underline-option').prop('checked', false);
+    $('.text-color-picker').val('#333333');
+    $('.bg-color-picker').val('#ffffff');
+    updateSampleTextStyle();
+  });
+
+  // ===== DRAG & DROP ZODIAC (clone as visible item + placeholder) =====
+  let isZodiacDragging = false;
+  let $zodiacDraggedItem = null;
+  let $zodiacClone = null;
+  let $zodiacPlaceholder = null;
+  let startOffsetX = 0;
+  let startOffsetY = 0;
+  let originalZodiacIndex = -1;
+
+  // Helpers
+  function getGridColumnCount($container) {
+    try {
+      const style = window.getComputedStyle($container[0]);
+      const cols = style.gridTemplateColumns;
+      if (!cols) return 5;
+      return cols.split(' ').length || 5;
+    } catch (e) {
+      return 5;
+    }
+  }
+  function getAllZodiacBoxes() {
+    return $('.drag-drop-content .zodiac-box');
+  }
+
+  // Start dragging (delegate)
+  $(document).on('mousedown', '.zodiac-box', function(e) {
+    // only start drag on left mouse button
+    if (e.which !== 1) return;
+    e.preventDefault();
+
+    $zodiacDraggedItem = $(this);
+    originalZodiacIndex = getAllZodiacBoxes().index($zodiacDraggedItem);
+
+    const rect = $zodiacDraggedItem[0].getBoundingClientRect();
+
+    // Create visible clone that follows cursor
+    $zodiacClone = $zodiacDraggedItem.clone()
+      .addClass('zodiac-clone')
+      .css({
+        position: 'fixed',
+        top: rect.top + 'px',
+        left: rect.left + 'px',
+        width: rect.width + 'px',
+        height: rect.height + 'px',
+        zIndex: 9999,
+        pointerEvents: 'none',
+        boxShadow: '0 10px 25px rgba(0,0,0,0.18)',
+        borderRadius: '10px',
+        transform: 'scale(1.03)',
+        transition: 'transform 0.08s ease'
+      });
+    $('body').append($zodiacClone);
+
+    // Placeholder where item was (dashed border)
+    $zodiacPlaceholder = $('<div class="zodiac-placeholder"></div>').css({
+      width: rect.width + 'px',
+      height: rect.height + 'px'
+    });
+    $zodiacDraggedItem.after($zodiacPlaceholder);
+
+    // Remove the real item from layout (detach) so the placeholder occupies its place
+    $zodiacDraggedItem.detach();
+
+    startOffsetX = e.clientX - rect.left;
+    startOffsetY = e.clientY - rect.top;
+
+    isZodiacDragging = true;
+
+    $(document).on('mousemove.zodiac', onZodiacMouseMove);
+    $(document).on('mouseup.zodiac', onZodiacMouseUp);
+  });
+
+  function onZodiacMouseMove(e) {
+    if (!isZodiacDragging || !$zodiacClone) return;
+
+    const x = e.clientX - startOffsetX;
+    const y = e.clientY - startOffsetY;
+
+    // move clone
+    $zodiacClone.css({ left: x + 'px', top: y + 'px' });
+
+    // calculate target placeholder position
+    const $dragDropContent = $('.drag-drop-content');
+    const contentRect = $dragDropContent[0].getBoundingClientRect();
+    const $allBoxes = getAllZodiacBoxes().not($zodiacPlaceholder);
+    const cols = getGridColumnCount($dragDropContent);
+    const boxWidth = contentRect.width / cols;
+    const firstBox = $allBoxes.first()[0];
+    const boxHeight = firstBox ? firstBox.getBoundingClientRect().height + 8 : boxWidth;
+
+    const gridX = e.clientX - contentRect.left;
+    const gridY = e.clientY - contentRect.top;
+
+    let targetCol = Math.floor(gridX / boxWidth);
+    let targetRow = Math.floor(gridY / boxHeight);
+
+    if (targetCol < 0) targetCol = 0;
+    if (targetRow < 0) targetRow = 0;
+
+    let targetIndex = targetRow * cols + targetCol;
+    targetIndex = Math.max(0, Math.min(targetIndex, $allBoxes.length));
+
+    // If placeholder isn't already at targetIndex, move it
+    const currentIndex = $zodiacPlaceholder.index();
+    if (targetIndex !== currentIndex) {
+      if (targetIndex >= $allBoxes.length) {
+        $dragDropContent.append($zodiacPlaceholder);
+      } else {
+        $allBoxes.eq(targetIndex).before($zodiacPlaceholder);
+      }
+    }
+  }
+
+  function onZodiacMouseUp(e) {
+    if (!isZodiacDragging) return;
+
+    // If mouse up is inside drag area and we have a placeholder -> insert before placeholder
+    if ($zodiacPlaceholder && $zodiacPlaceholder.length) {
+      $zodiacPlaceholder.before($zodiacDraggedItem);
+      $zodiacPlaceholder.remove();
+    } else {
+      // if no placeholder found (edge case), append to container
+      $('.drag-drop-content').append($zodiacDraggedItem);
     }
 
-    function onMouseUp() {
-        if (!isDragging || !$draggedItem || !$clone) return;
+    // remove clone
+    if ($zodiacClone) $zodiacClone.remove();
 
-        const finalTop = $clone.offset().top;
-        const cloneHeight = $clone.outerHeight();
-        const finalCenter = finalTop + cloneHeight / 2;
+    // cleanup
+    isZodiacDragging = false;
+    $zodiacClone = null;
+    $zodiacDraggedItem = null;
+    $zodiacPlaceholder = null;
+    $(document).off('mousemove.zodiac', onZodiacMouseMove);
+    $(document).off('mouseup.zodiac', onZodiacMouseUp);
+  }
 
-        const $aside = $('.aside');
+  // ===== ADD NEW ZODIAC BOX =====
+  $('.add-zodiac-btn').on('click', function() {
+    const selectedZodiac = $('.zodiac-select').val();
+    const zodiacEmoji = $('.zodiac-select option:selected').html();
+    const zodiacNames = {
+      rat: "Mouse", ox: "Buffalo", tiger: "Tiger", cat: "Cat",
+      dragon: "Dragon", snake: "Snake", horse: "Horse", goat: "Goat",
+      monkey: "Monkey", rooster: "Rooster", dog: "Dog", pig: "Pig"
+    };
+    const zodiacName = zodiacNames[selectedZodiac] || selectedZodiac;
 
-        // Lấy các box khác (không bao gồm item đang kéo)
-        const $otherBoxes = $aside.find('.aside-box').not($draggedItem);
-        let inserted = false;
+    const $zodiacBox = $(`
+      <div class="zodiac-box" data-zodiac="${selectedZodiac}">
+        <div class="zodiac-icon-box">
+          <div class="zodiac-emoji">${zodiacEmoji}</div>
+        </div>
+        <div class="zodiac-name-box">
+          <div class="zodiac-name">${zodiacName}</div>
+        </div>
+      </div>
+    `);
+    $('.drag-drop-content').append($zodiacBox);
+    // No extra binding required because we use delegated mousedown on '.zodiac-box'
+  });
 
-        // Duyệt các box và so sánh tâm clone với tâm box
-        $otherBoxes.each(function() {
-            const $box = $(this);
-            const boxTop = $box.offset().top;
-            const boxHeight = $box.outerHeight();
-            const boxMiddle = boxTop + boxHeight / 2;
+  // ensure existing boxes are draggable (delegated handler covers them)
 
-            if (finalCenter < boxMiddle) {
-                $box.before($draggedItem);
-                inserted = true;
-                return false; // break
-            }
-        });
-
-        // Nếu không chèn ở giữa bất kỳ box nào, append vào cuối (đảm bảo có thể drop xuống dưới box cuối)
-        if (!inserted) {
-            $aside.append($draggedItem);
-        }
-
-        // Dọn dẹp: remove clone, phục hồi style gốc
-        $clone.remove();
-        $draggedItem.removeClass('dragging-original').css('opacity', '');
-        isDragging = false;
-        $draggedItem = null;
-        $clone = null;
-        $(document).off('mousemove.drag');
-        $(document).off('mouseup.drag');
+  // ===== SAFETY: cancel drag if user presses Escape =====
+  $(document).on('keydown', function(e) {
+    if (e.key === 'Escape' && isZodiacDragging) {
+      // return item to original place
+      if ($zodiacClone) $zodiacClone.remove();
+      if ($zodiacPlaceholder && $zodiacPlaceholder.length) {
+        $zodiacPlaceholder.before($zodiacDraggedItem);
+        $zodiacPlaceholder.remove();
+      } else {
+        $('.drag-drop-content').append($zodiacDraggedItem);
+      }
+      isZodiacDragging = false;
+      $zodiacClone = null;
+      $zodiacDraggedItem = null;
+      $zodiacPlaceholder = null;
+      $(document).off('mousemove.zodiac', onZodiacMouseMove);
+      $(document).off('mouseup.zodiac', onZodiacMouseUp);
     }
+  });
 
-    // ===== CHỨC NĂNG TEXT DECORATION =====
-    // Biến lưu trữ style hiện tại
-    let currentTextColor = '#333333';
-    let currentBgColor = '#ffffff';
-    let currentFontWeight = 'normal';
-    let currentFontStyle = 'normal';
-    let currentTextDecoration = 'none';
-
-    // Mở/đóng hộp thoại decoration
-    $(document).on('click', '.decorate-icon', function(e) {
-        e.stopPropagation();
-        const $decorateBox = $(this).closest('.decorate-box');
-        const $options = $decorateBox.find('.decorate-options');
-        
-        // Đóng tất cả hộp thoại khác và xóa class show-options
-        $('.decorate-box').not($decorateBox).removeClass('show-options');
-        $('.decorate-options').not($options).hide();
-        
-        // Toggle hộp thoại hiện tại và class show-options
-        $options.toggle();
-        $decorateBox.toggleClass('show-options', $options.is(':visible'));
-    });
-
-    // Đóng khi click ra ngoài
-    $(document).on('click', function(e) {
-        if (!$(e.target).closest('.decorate-box').length) {
-            $('.decorate-options').hide();
-            $('.decorate-box').removeClass('show-options');
-        }
-    });
-
-    // Cập nhật style mẫu
-    function updateSampleTextStyle() {
-        const $box = $('.decorate-box');
-        const $sample = $box.find('.sample-text');
-
-        // Cập nhật style cho sample text
-        $sample.css({
-            'font-weight': currentFontWeight,
-            'font-style': currentFontStyle,
-            'text-decoration': currentTextDecoration,
-            'background-color': currentBgColor,
-            'color': currentTextColor
-        });
-    }
-
-    // Xử lý thay đổi màu chữ
-    $(document).on('input change', '.text-color-picker', function() {
-        currentTextColor = $(this).val();
-        updateSampleTextStyle();
-    });
-
-    // Xử lý thay đổi màu nền
-    $(document).on('input change', '.bg-color-picker', function() {
-        currentBgColor = $(this).val();
-        updateSampleTextStyle();
-    });
-
-    // Xử lý thay đổi style chữ (bold, italic, underline)
-    $(document).on('change', '.bold-option', function() {
-        currentFontWeight = $(this).is(':checked') ? 'bold' : 'normal';
-        updateSampleTextStyle();
-    });
-
-    $(document).on('change', '.italic-option', function() {
-        currentFontStyle = $(this).is(':checked') ? 'italic' : 'normal';
-        updateSampleTextStyle();
-    });
-
-    $(document).on('change', '.underline-option', function() {
-        currentTextDecoration = $(this).is(':checked') ? 'underline' : 'none';
-        updateSampleTextStyle();
-    });
-
-    // ===== CHỨC NĂNG XỬ LÝ TEXT (HIGHLIGHT, DELETE, RESET) =====
-    // Lưu nội dung gốc để reset
-    const originalContent = $('.process-text-content').html();
-
-    $('.highlight-btn').on('click', function() {
-        const regexText = $('.regex-box').val();
-        if (!regexText) {
-            console.log('Vui lòng nhập regex!');
-            return;
-        }
-        
-        try {
-            // Sử dụng flag 'g' thay vì 'gi' để phân biệt hoa thường
-            const regex = new RegExp(regexText, 'g');
-            const $content = $('.process-text-content');
-            let content = $content.html();
-            
-            // Loại bỏ các highlight cũ để tránh chồng chất
-            content = content.replace(/<span class="highlighted"[^>]*>(.*?)<\/span>/gi, '$1');
-            
-            // Highlight text với style hiện tại từ decoration (phân biệt hoa thường)
-            content = content.replace(regex, match => 
-                `<span class="highlighted" style="font-weight: ${currentFontWeight}; font-style: ${currentFontStyle}; text-decoration: ${currentTextDecoration}; background-color: ${currentBgColor}; color: ${currentTextColor};">${match}</span>`
-            );
-            
-            $content.html(content);
-        } catch (e) {
-            console.log('Regex không hợp lệ! Vui lòng kiểm tra lại.');
-        }
-    });
-
-    $('.delete-btn').on('click', function() {
-        const regexText = $('.regex-box').val();
-        if (!regexText) {
-            console.log('Vui lòng nhập regex!');
-            return;
-        }
-        
-        try {
-            // Sử dụng flag 'g' thay vì 'gi' để phân biệt hoa thường
-            const regex = new RegExp(regexText, 'g');
-            const $content = $('.process-text-content');
-            let content = $content.html();
-            
-            // Xóa cả text thường và text đã highlight khớp regex (phân biệt hoa thường)
-            // Escape regexText để tránh lỗi khi có ký tự đặc biệt trong regex
-            const escapedRegexText = regexText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-            content = content.replace(new RegExp(`<span class="highlighted"[^>]*>(${escapedRegexText})<\/span>`, 'g'), '');
-            content = content.replace(regex, '');
-            
-            $content.html(content);
-        } catch (e) {
-            console.log('Regex không hợp lệ! Vui lòng kiểm tra lại.');
-        }
-    });
-
-    $('.reset-btn').on('click', function() {
-        // Reset về nội dung gốc
-        $('.process-text-content').html(originalContent);
-        $('.regex-box').val('');
-        
-        // Reset style decoration về mặc định
-        currentTextColor = '#333333';
-        currentBgColor = '#ffffff';
-        currentFontWeight = 'normal';
-        currentFontStyle = 'normal';
-        currentTextDecoration = 'none';
-        
-        // Reset các checkbox và color picker
-        $('.bold-option, .italic-option, .underline-option').prop('checked', false);
-        $('.text-color-picker').val('#333333');
-        $('.bg-color-picker').val('#ffffff');
-        
-        // Cập nhật lại sample text
-        updateSampleTextStyle();
-    });
-
-    // ===== CHỨC NĂNG KÉO THẢ ZODIAC BOX =====
-    let isZodiacDragging = false;
-    let $zodiacDraggedItem = null;
-    let $zodiacClone = null;
-    let zodiacStartX = 0;
-    let zodiacStartY = 0;
-    let originalIndex = -1;
-
-    // Helper: lấy số cột grid hiện tại từ CSS
-    function getGridColumnCount($container) {
-        try {
-            const style = window.getComputedStyle($container[0]);
-            const cols = style.gridTemplateColumns;
-            if (!cols) return 5;
-            return cols.split(' ').length || 5;
-        } catch (e) {
-            return 5;
-        }
-    }
-
-    // Helper: lấy tất cả zodiac boxes (kể cả đang kéo)
-    function getAllZodiacBoxes() {
-        return $('.drag-drop-content .zodiac-box');
-    }
-
-    // Thêm sự kiện kéo thả cho box zodiac
-    function addZodiacDragEvents($zodiacBox) {
-        $zodiacBox.on('mousedown', function(e) {
-            e.preventDefault();
-            
-            isZodiacDragging = true;
-            $zodiacDraggedItem = $(this);
-            zodiacStartX = e.clientX;
-            zodiacStartY = e.clientY;
-            
-            // Lưu vị trí ban đầu từ tất cả boxes (kể cả chính nó)
-            originalIndex = getAllZodiacBoxes().index($zodiacDraggedItem);
-            
-            // Tạo clone
-            $zodiacClone = $zodiacDraggedItem.clone();
-            const originalRect = $zodiacDraggedItem[0].getBoundingClientRect();
-            
-            $zodiacClone.addClass('dragging-clone').css({
-                'position': 'fixed',
-                'z-index': '1000',
-                'width': originalRect.width + 'px',
-                'height': originalRect.height + 'px',
-                'opacity': '0.9',
-                'pointer-events': 'none',
-                'left': originalRect.left + 'px',
-                'top': originalRect.top + 'px'
-            });
-            
-            // Đánh dấu item gốc là đang kéo
-            $zodiacDraggedItem.addClass('dragging-original');
-            
-            // Thêm clone vào body
-            $('body').append($zodiacClone);
-            
-            // Thêm sự kiện di chuyển và thả
-            $(document).on('mousemove.zodiac', onZodiacMouseMove);
-            $(document).on('mouseup.zodiac', onZodiacMouseUp);
-        });
-    }
-
-    function onZodiacMouseMove(e) {
-        if (!isZodiacDragging || !$zodiacClone) return;
-        
-        const deltaX = e.clientX - zodiacStartX;
-        const deltaY = e.clientY - zodiacStartY;
-        
-        // Di chuyển clone
-        const originalRect = $zodiacDraggedItem[0].getBoundingClientRect();
-        $zodiacClone.css({
-            'left': originalRect.left + deltaX + 'px',
-            'top': originalRect.top + deltaY + 'px'
-        });
-    }
-
-    function onZodiacMouseUp(e) {
-        if (!isZodiacDragging || !$zodiacDraggedItem || !$zodiacClone) return;
-
-        const $dragDropContent = $('.drag-drop-content');
-        const contentRect = $dragDropContent[0].getBoundingClientRect();
-
-        // Kiểm tra nếu chuột thả trong vùng chứa
-        const isInContent = (
-            e.clientX >= contentRect.left &&
-            e.clientX <= contentRect.right &&
-            e.clientY >= contentRect.top &&
-            e.clientY <= contentRect.bottom
-        );
-
-        if (isInContent) {
-            const $allBoxes = getAllZodiacBoxes().not('.dragging-original');
-            const cols = getGridColumnCount($dragDropContent);
-            const boxWidth = contentRect.width / cols;
-
-            // ✅ Sửa lỗi: dùng chiều cao thật của 1 box để tính hàng
-            const firstBox = $allBoxes.first()[0];
-            const boxHeight = firstBox ? firstBox.getBoundingClientRect().height + 8 : boxWidth;
-
-            const gridX = e.clientX - contentRect.left;
-            const gridY = e.clientY - contentRect.top;
-
-            const targetCol = Math.floor(gridX / boxWidth);
-            const targetRow = Math.floor(gridY / boxHeight);
-
-            // Tính chỉ số index mục tiêu
-            let targetIndex = targetRow * cols + targetCol;
-
-            // Giới hạn chỉ số hợp lệ
-            targetIndex = Math.max(0, Math.min(targetIndex, $allBoxes.length));
-
-            // Nếu vị trí khác thì di chuyển
-            if (targetIndex !== originalIndex) {
-                $zodiacDraggedItem.detach();
-                if (targetIndex >= $allBoxes.length) {
-                    $dragDropContent.append($zodiacDraggedItem);
-                } else {
-                    $allBoxes.eq(targetIndex).before($zodiacDraggedItem);
-                }
-            }
-        }
-
-        // Dọn dẹp
-        cleanupZodiacDrag();
-    }
-
-    function cleanupZodiacDrag() {
-        // Xóa clone
-        if ($zodiacClone) {
-            $zodiacClone.remove();
-            $zodiacClone = null;
-        }
-        
-        // Reset styles
-        if ($zodiacDraggedItem) {
-            $zodiacDraggedItem.removeClass('dragging-original');
-            $zodiacDraggedItem = null;
-        }
-        
-        // Reset variables
-        isZodiacDragging = false;
-        originalIndex = -1;
-        
-        // Xóa sự kiện
-        $(document).off('mousemove.zodiac');
-        $(document).off('mouseup.zodiac');
-    }
-
-    // Thêm box zodiac mới
-    $('.add-zodiac-btn').on('click', function() {
-        const selectedZodiac = $('.zodiac-select').val();
-        const zodiacEmoji = $('.zodiac-select option:selected').html();
-        const zodiacNames = {
-            rat: "Mouse",
-            ox: "Buffalo", 
-            tiger: "Tiger",
-            cat: "Cat",
-            dragon: "Dragon",
-            snake: "Snake",
-            horse: "Horse",
-            goat: "Goat",
-            monkey: "Monkey",
-            rooster: "Rooster",
-            dog: "Dog",
-            pig: "Pig"
-        };
-        const zodiacName = zodiacNames[selectedZodiac] || selectedZodiac;
-
-        const $zodiacBox = $(`
-            <div class="zodiac-box" data-zodiac="${selectedZodiac}">
-                <div class="zodiac-icon-box">
-                    <div class="zodiac-emoji">${zodiacEmoji}</div>
-                </div>
-                <div class="zodiac-name-box">
-                    <div class="zodiac-name">${zodiacName}</div>
-                </div>
-            </div>
-        `);
-
-        $('.drag-drop-content').append($zodiacBox);
-
-        // Thêm sự kiện kéo thả cho box mới
-        addZodiacDragEvents($zodiacBox);
-    });
-
-    // Thêm sự kiện kéo thả cho các box zodiac tồn tại
-    getAllZodiacBoxes().each(function() {
-        addZodiacDragEvents($(this));
-    });
-});
+}); // end document.ready
