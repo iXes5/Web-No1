@@ -342,8 +342,8 @@
 .drag-drop-content {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 15px;
-    padding: 15px;
+    gap: 8px;
+    padding: 25px;
     min-height: 200px;
     position: relative;
 }
@@ -351,33 +351,50 @@
 .zodiac-box {
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
-    height: 80px;
-    border-radius: 8px;
-    background-color: #1a3c8b; /* xanh đậm */
-    color: white;
-    font-weight: bold;
-    cursor: move;
+    justify-content: stretch;
+    width: 100%;
+    height: 100px;
+    overflow: hidden; 
+    cursor: pointer;
     transition: transform 0.2s ease;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     user-select: none;
 }
 
-.zodiac-box:hover {
-    transform: scale(1.05);
-    background-color: #274fae; /* xanh sáng hơn khi hover */
+/* Box chứa emoji */
+.zodiac-icon-box {
+    flex: 2;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at center, #4c7be0 0%, #1a3c8b 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .zodiac-emoji {
-    font-size: 32px;
-    margin-bottom: 4px;
+    font-size: 40px;
+    color: white;
+    user-select: none;
+}
+
+/* Box chứa tên */
+.zodiac-name-box {
+    flex: 1;
+    width: 100%;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .zodiac-name {
     font-size: 15px;
+    font-weight: 200;
+    color: black;
     letter-spacing: 0.5px;
 }
+
 
 /* Ngăn chặn selection khi kéo */
 .zodiac-box {

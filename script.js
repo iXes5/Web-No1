@@ -319,49 +319,37 @@ $(document).ready(function() {
     });
 
     // ===== NGĂN CHẶN SELECTION KHI KÉO THẢ =====
-    $('.move-btn, .aside-box-bar').on('selectstart', function(e) {
-        e.preventDefault();
-    });
-
-    // ===== CHỨC NĂNG ZODIAC DRAG & DROP =====
-    let isZodiacDragging = false;
-    let $zodiacDraggedItem = null;
-    let $zodiacClone = null;
-    let zodiacStartX = 0;
-    let zodiacStartY = 0;
-    let originalIndex = -1;
-
-    // Danh sách tên con giáp tiếng Anh
-    const zodiacNames = {
-        rat: "Mouse",
-        ox: "Buffalo",
-        tiger: "Tiger",
-        cat: "Cat",
-        dragon: "Dragon",
-        snake: "Snake",
-        horse: "Horse",
-        goat: "Goat",
-        monkey: "Monkey",
-        rooster: "Rooster",
-        dog: "Dog",
-        pig: "Pig"
-    };
-
     // Thêm box zodiac mới
     $('.add-zodiac-btn').on('click', function() {
         const selectedZodiac = $('.zodiac-select').val();
         const zodiacEmoji = $('.zodiac-select option:selected').html();
+        const zodiacNames = {
+            rat: "Mouse",
+            ox: "Buffalo",
+            tiger: "Tiger",
+            cat: "Cat",
+            dragon: "Dragon",
+            snake: "Snake",
+            horse: "Horse",
+            goat: "Goat",
+            monkey: "Monkey",
+            rooster: "Rooster",
+            dog: "Dog",
+            pig: "Pig"
+        };
         const zodiacName = zodiacNames[selectedZodiac] || selectedZodiac;
 
-        // Tạo box zodiac mới với emoji + tên
         const $zodiacBox = $(`
             <div class="zodiac-box" data-zodiac="${selectedZodiac}">
-                <div class="zodiac-emoji">${zodiacEmoji}</div>
-                <div class="zodiac-name">${zodiacName}</div>
+                <div class="zodiac-icon-box">
+                    <div class="zodiac-emoji">${zodiacEmoji}</div>
+                </div>
+                <div class="zodiac-name-box">
+                    <div class="zodiac-name">${zodiacName}</div>
+                </div>
             </div>
         `);
 
-        // Thêm vào content
         $('.drag-drop-content').append($zodiacBox);
     });
 });
