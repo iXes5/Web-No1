@@ -399,62 +399,50 @@ $(document).ready(function() {
 
     function onZodiacMouseUp(e) {
         if (!isZodiacDragging || !$zodiacDraggedItem || !$zodiacClone) return;
-        
+
         const $dragDropContent = $('.drag-drop-content');
         const contentRect = $dragDropContent[0].getBoundingClientRect();
-        
-        // Kiểm tra xem có trong vùng content không
-        const isInContent = e.clientX >= contentRect.left && e.clientX <= contentRect.right &&
-                        e.clientY >= contentRect.top && e.clientY <= contentRect.bottom;
-        
+
+        // Kiểm tra nếu chuột thả trong vùng chứa
+        const isInContent = (
+            e.clientX >= contentRect.left &&
+            e.clientX <= contentRect.right &&
+            e.clientY >= contentRect.top &&
+            e.clientY <= contentRect.bottom
+        );
+
         if (isInContent) {
-            // Tính toán vị trí mới - FIX: chỉ tính toán dựa trên phần icon box
-            const $allBoxes = getAllZodiacBoxes();
+            const $allBoxes = getAllZodiacBoxes().not('.dragging-original');
             const cols = getGridColumnCount($dragDropContent);
             const boxWidth = contentRect.width / cols;
-            
+
+            // ✅ Sửa lỗi: dùng chiều cao thật của 1 box để tính hàng
+            const firstBox = $allBoxes.first()[0];
+            const boxHeight = firstBox ? firstBox.getBoundingClientRect().height + 8 : boxWidth;
+
             const gridX = e.clientX - contentRect.left;
             const gridY = e.clientY - contentRect.top;
-            
+
             const targetCol = Math.floor(gridX / boxWidth);
-            const targetRow = Math.floor(gridY / boxWidth); // Sử dụng boxWidth cho cả chiều cao để đồng bộ
-            
+            const targetRow = Math.floor(gridY / boxHeight);
+
+            // Tính chỉ số index mục tiêu
             let targetIndex = targetRow * cols + targetCol;
-            
-            // FIX: Điều chỉnh targetIndex dựa trên vị trí chuột trong box
-            // Lấy box tại vị trí target để xác định vùng click
-            const $targetBoxes = $allBoxes.not('.dragging-original');
-            if (targetIndex < $targetBoxes.length) {
-                const $potentialTarget = $targetBoxes.eq(targetIndex);
-                const targetRect = $potentialTarget[0].getBoundingClientRect();
-                
-                // Tính tỷ lệ vị trí chuột trong box (0 đến 1)
-                const relativeY = (e.clientY - targetRect.top) / targetRect.height;
-                
-                // Nếu click ở nửa trên của box, giữ nguyên targetIndex
-                // Nếu click ở nửa dưới của box, tăng targetIndex lên 1
-                if (relativeY > 0.5) {
-                    targetIndex = Math.min(targetIndex + 1, $targetBoxes.length);
-                }
-            }
-            
-            // Giới hạn targetIndex trong phạm vi hợp lệ
-            targetIndex = Math.max(0, Math.min(targetIndex, $targetBoxes.length));
-            
-            // Chỉ di chuyển nếu vị trí thay đổi
+
+            // Giới hạn chỉ số hợp lệ
+            targetIndex = Math.max(0, Math.min(targetIndex, $allBoxes.length));
+
+            // Nếu vị trí khác thì di chuyển
             if (targetIndex !== originalIndex) {
-                // Tách item ra khỏi vị trí hiện tại
                 $zodiacDraggedItem.detach();
-                
-                // Chèn vào vị trí mới
-                if (targetIndex >= $targetBoxes.length) {
+                if (targetIndex >= $allBoxes.length) {
                     $dragDropContent.append($zodiacDraggedItem);
                 } else {
-                    $targetBoxes.eq(targetIndex).before($zodiacDraggedItem);
+                    $allBoxes.eq(targetIndex).before($zodiacDraggedItem);
                 }
             }
         }
-        
+
         // Dọn dẹp
         cleanupZodiacDrag();
     }
