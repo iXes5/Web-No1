@@ -305,4 +305,30 @@ $(document).ready(function() {
         }
     });
 
+    // ===== CHỨC NĂNG XỬ LÝ TEXT (RESET) =====
+    $('.reset-btn').on('click', function() {
+        // Reset về nội dung gốc
+        $('.process-text-content').html(originalContent);
+        $('.regex-box').val('');
+        
+        // LỖI: Gán giá trị cho biến cục bộ thay vì biến toàn cục
+        // Các biến này chỉ có tác dụng trong scope hàm này
+        let currentTextColor = '#333333';
+        let currentBgColor = '#ffffff'; 
+        let currentFontWeight = 'normal';
+        let currentFontStyle = 'normal';
+        let currentTextDecoration = 'none';
+        
+        // Reset các checkbox và color picker
+        $('.bold-option, .italic-option, .underline-option').prop('checked', false);
+        $('.text-color-picker').val('#333333');
+        $('.bg-color-picker').val('#ffffff');
+        
+        // LỖI: Gọi hàm update nhưng biến style đã bị thay đổi trong scope cục bộ
+        // nên không ảnh hưởng đến các chức năng khác
+        updateSampleTextStyle();
+        
+        console.log('Reset completed but global variables not updated!');
+        console.log('Global currentTextColor is still:', window.currentTextColor);
+    });
 });
