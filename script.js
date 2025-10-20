@@ -52,6 +52,16 @@ $(document).ready(function() {
         $btn.text($box.hasClass('closed') ? '►' : '↓');
     });
 
+    // ===== CHỨC NĂNG ĐÓNG/MỞ NEWS BOX =====
+    $('.aside-box .toggle-btn').on('click', function(e) {
+        e.stopPropagation();
+        const $box = $(this).closest('.aside-box');
+        const $btn = $(this);
+        
+        $box.toggleClass('closed');
+        $btn.text($box.hasClass('closed') ? '►' : '↓');
+    });
+
     // ===== CHỨC NĂNG KÉO THẢ NEWS BOX =====
     let isDragging = false;
     let $draggedItem = null;
@@ -129,31 +139,35 @@ $(document).ready(function() {
         if (!isDragging || !$draggedItem || !$clone) return;
 
         const finalTop = $clone.offset().top;
+        const cloneHeight = $clone.outerHeight();
+        const finalCenter = finalTop + cloneHeight / 2;
+
         const $aside = $('.aside');
 
-        // TÌM VỊ TRÍ MỚI: duyệt các box khác (không bao gồm item đang kéo)
+        // Lấy các box khác (không bao gồm item đang kéo)
         const $otherBoxes = $aside.find('.aside-box').not($draggedItem);
         let inserted = false;
 
+        // Duyệt các box và so sánh tâm clone với tâm box
         $otherBoxes.each(function() {
             const $box = $(this);
             const boxTop = $box.offset().top;
             const boxHeight = $box.outerHeight();
             const boxMiddle = boxTop + boxHeight / 2;
 
-            if (finalTop < boxMiddle) {
+            if (finalCenter < boxMiddle) {
                 $box.before($draggedItem);
                 inserted = true;
-                return false; // break loop
+                return false; // break
             }
         });
 
-        // Nếu không tìm thấy vị trí phù hợp thì append vào cuối aside
+        // Nếu không chèn ở giữa bất kỳ box nào, append vào cuối (đảm bảo có thể drop xuống dưới box cuối)
         if (!inserted) {
             $aside.append($draggedItem);
         }
 
-        // Dọn dẹp: loại bỏ clone, phục hồi style gốc
+        // Dọn dẹp: remove clone, phục hồi style gốc
         $clone.remove();
         $draggedItem.removeClass('dragging-original').css('opacity', '');
         isDragging = false;
@@ -162,4 +176,31 @@ $(document).ready(function() {
         $(document).off('mousemove.drag');
         $(document).off('mouseup.drag');
     }
+
+    // ===== CHỨC NĂNG TEXT DECORATION =====
+    // Biến lưu trữ style hiện tại
+    let currentTextColor = '#333333';
+    let currentBgColor = '#ffffff';
+    let currentFontWeight = 'normal';
+    let currentFontStyle = 'normal';
+    let currentTextDecoration = 'none';
+
+    // Mở/đóng hộp thoại decoration
+    $(document).on('click', '.decorate-icon', function(e) {
+        e.stopPropagation();
+        const $options = $(this).siblings('.decorate-options');
+        
+        // Đóng tất cả hộp thoại khác
+        $('.decorate-options').not($options).hide();
+        
+        // Toggle hộp thoại hiện tại
+        $options.toggle();
+    });
+
+    // Đóng khi click ra ngoài
+    $(document).on('click', function(e) {
+        if (!$(e.target).closest('.decorate-box').length) {
+            $('.decorate-options').hide();
+        }
+    });
 });
