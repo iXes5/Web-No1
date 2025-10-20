@@ -246,4 +246,34 @@ $(document).ready(function() {
         currentTextDecoration = $(this).is(':checked') ? 'underline' : 'none';
         updateSampleTextStyle();
     });
+
+    // ===== CHỨC NĂNG XỬ LÝ TEXT (HIGHLIGHT) =====
+    // Lưu nội dung gốc để reset
+    const originalContent = $('.process-text-content').html();
+
+    $('.highlight-btn').on('click', function() {
+        const regexText = $('.regex-box').val();
+        if (!regexText) {
+            console.log('Vui lòng nhập regex!');
+            return;
+        }
+        
+        try {
+            const regex = new RegExp(regexText, 'g');
+            const $content = $('.process-text-content');
+            let content = $content.html();
+            
+            // LỖI: Không loại bỏ các highlight cũ trước khi highlight mới
+            // content = content.replace(/<span class="highlighted"[^>]*>(.*?)<\/span>/gi, '$1');
+            
+            // Highlight text với style hiện tại từ decoration
+            content = content.replace(regex, match => 
+                `<span class="highlighted" style="font-weight: ${currentFontWeight}; font-style: ${currentFontStyle}; text-decoration: ${currentTextDecoration}; background-color: ${currentBgColor}; color: ${currentTextColor};">${match}</span>`
+            );
+            
+            $content.html(content);
+        } catch (e) {
+            console.log('Regex không hợp lệ! Vui lòng kiểm tra lại.');
+        }
+    });
 });
