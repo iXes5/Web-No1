@@ -288,15 +288,15 @@ $(document).ready(function() {
         }
         
         try {
+            // Sử dụng flag 'g' thay vì 'gi' để phân biệt hoa thường
             const regex = new RegExp(regexText, 'g');
             const $content = $('.process-text-content');
             let content = $content.html();
             
+            // Xóa cả text thường và text đã highlight khớp regex (phân biệt hoa thường)
             // Escape regexText để tránh lỗi khi có ký tự đặc biệt trong regex
             const escapedRegexText = regexText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-            
-            // LỖI: Pattern regex cho highlight text không chính xác
-            content = content.replace(new RegExp(`<span class="highlighted"[^>]*>${escapedRegexText}<\/span>`, 'g'), '');
+            content = content.replace(new RegExp(`<span class="highlighted"[^>]*>(${escapedRegexText})<\/span>`, 'g'), '');
             content = content.replace(regex, '');
             
             $content.html(content);
@@ -304,4 +304,5 @@ $(document).ready(function() {
             console.log('Regex không hợp lệ! Vui lòng kiểm tra lại.');
         }
     });
+
 });
