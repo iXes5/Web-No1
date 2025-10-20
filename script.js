@@ -203,4 +203,19 @@ $(document).ready(function() {
             $('.decorate-options').hide();
         }
     });
+
+    // Cập nhật style mẫu
+    function updateSampleTextStyle() {
+        const $box = $('.decorate-box');
+        const $sample = $box.find('.sample-text');
+
+        // Cập nhật style cho sample text
+        $sample.css({
+            'font-weight': currentFontWeight,
+            'font-style': currentFontStyle,
+            'text-decoration': currentTextDecoration,
+            'background-color': currentBgColor,
+            'color': currentTextColor
+        });
+    }
 });
