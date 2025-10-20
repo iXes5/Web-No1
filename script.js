@@ -107,8 +107,22 @@ $(document).ready(function() {
         
         // Tính toán vị trí mới - không giới hạn phạm vi
         const newTop = startTop + deltaY;
-        
-        $clone.css('top', newTop + 'px');
+
+        // Lấy thông tin khung aside
+        const $aside = $('.aside');
+        const asideTop = $aside.offset().top;
+        const asideHeight = $aside.outerHeight();
+        const cloneHeight = $clone.outerHeight();
+
+        // Giới hạn vị trí top
+        const minTop = asideTop;
+        const maxTop = asideTop + asideHeight - cloneHeight;
+
+        // Ràng buộc vị trí
+        const boundedTop = Math.min(Math.max(newTop, minTop), maxTop);
+
+        // Cập nhật vị trí clone
+        $clone.css('top', boundedTop + 'px');
     }
 
     function onMouseUp() {
