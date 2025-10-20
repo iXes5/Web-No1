@@ -430,22 +430,49 @@
   will-change: transform, left, top;
 }
 
-/* Khi placeholder thay đổi vị trí */
-.zodiac-placeholder {
-  border: 2px dashed #bbb;
-  border-radius: 10px;
-  background: transparent;
-  opacity: 0.7;
-  box-sizing: border-box;
-  transition: all 0.25s ease; /* mượt khi di chuyển giữa các ô */
-}
-
 /* Khi phần tử thả vào chỗ mới, cho nó một hiệu ứng bật nhẹ */
 .zodiac-box {
   transition: transform 0.25s ease, opacity 0.2s ease;
 }
 .zodiac-box.dropped {
   transform: scale(1.1);
+}
+
+/* Thêm vào cuối file style.css */
+
+/* Improved zodiac box transitions */
+.zodiac-box {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.zodiac-box.dragging-original {
+    opacity: 0.9;
+}
+
+.zodiac-placeholder {
+    border: 2px dashed #4a90e2;
+    border-radius: 8px;
+    background: rgba(74, 144, 226, 0.1);
+    opacity: 0.7;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+/* Smooth drop animation */
+@keyframes smoothDrop {
+    0% {
+        transform: scale(1.05);
+    }
+    50% {
+        transform: scale(0.98);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.zodiac-box.dropped {
+    animation: smoothDrop 0.3s ease;
 }
 
 .footer {
@@ -523,4 +550,198 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
     transform: scale(1.02);
     transition: none;
+}
+
+/* ===== RESPONSIVE DESIGN - BREAKPOINT 576px ===== */
+@media screen and (max-width: 576px) {
+    .container {
+        width: 100%;
+        padding: 0 10px;
+        box-sizing: border-box;
+    }
+
+    .header {
+        height: 50px;
+        border-radius: 3px;
+    }
+
+    .title {
+        font-size: 20px;
+    }
+
+    .navbar {
+        width: 100%;
+        height: auto;
+        flex-direction: column;
+        margin-top: 0;
+        padding: 5px 0;
+    }
+
+    .navbar a {
+        width: 100%;
+        text-align: center;
+        padding: 8px 0;
+        border-bottom: 1px solid #a0c1ff;
+    }
+
+    .navbar a:last-child {
+        border-bottom: none;
+    }
+
+    .main {
+        flex-direction: column;
+        border: none;
+        margin: 0;
+    }
+
+    .aside {
+        width: 100%;
+        order: 2;
+        margin-top: 10px;
+    }
+
+    .content {
+        width: 100%;
+        margin-left: 0;
+        order: 1;
+    }
+
+    .process-text {
+        height: auto;
+        min-height: 250px;
+    }
+
+    .process-text-bar {
+        flex-direction: column;
+        height: auto;
+        padding: 10px;
+        gap: 10px;
+    }
+
+    .process-text-title {
+        font-size: 16px;
+    }
+
+    .execute-box {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .regex-box {
+        width: 150px;
+    }
+
+    .decorate-box {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .process-text-content {
+        font-size: 16px;
+        padding: 10px;
+    }
+
+    .drag-drop-bar {
+        flex-direction: column;
+        height: auto;
+        padding: 10px;
+        gap: 10px;
+    }
+
+    .zodiac-controls {
+        margin-left: 0;
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .zodiac-select {
+        width: 100%;
+        max-width: 200px;
+    }
+
+    .drag-drop-content {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 6px;
+        padding: 15px;
+    }
+
+    .zodiac-emoji {
+        font-size: 35px;
+    }
+
+    .zodiac-name {
+        font-size: 13px;
+    }
+
+    .footer {
+        height: auto;
+        padding: 8px 0;
+    }
+
+    .footer-content {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .copyright {
+        padding: 0;
+        text-align: center;
+    }
+
+    .footer-menu {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .footer-menu a {
+        padding: 5px 8px;
+    }
+
+    /* Ẩn gạch phân cách trên mobile */
+    .footer-menu a::after {
+        display: none;
+    }
+
+    /* Responsive cho aside boxes */
+    .aside-box-bar {
+        padding: 8px 10px;
+    }
+
+    .aside-title {
+        font-size: 16px;
+    }
+
+    /* Responsive cho text processing buttons */
+    .highlight-btn, .delete-btn, .reset-btn {
+        font-size: 11px;
+        padding: 4px 8px;
+    }
+
+    /* Responsive cho decorate options */
+    .decorate-options {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 90%;
+        max-width: 280px;
+        z-index: 1000;
+    }
+
+    .decorate-box.show-options .decorate-icon::before,
+    .decorate-box.show-options .decorate-icon::after {
+        display: none;
+    }
+}
+
+/* Thêm viewport meta tag đảm bảo responsive hoạt động tốt */
+@media screen and (max-width: 576px) {
+    body {
+        overflow-x: hidden;
+    }
+    
+    /* Đảm bảo images và các phần tử khác không vượt quá màn hình */
+    img, .zodiac-box, .aside-box {
+        max-width: 100%;
+    }
 }
